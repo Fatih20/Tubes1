@@ -55,7 +55,7 @@ public class OutputFrameController {
 
     private static final int ROW = 8;
     private static final int COL = 8;
-    private Button[][] buttons = new Button[ROW][COL];
+    private final Button[][] buttons = new Button[ROW][COL];
 
 
     /**
@@ -77,7 +77,7 @@ public class OutputFrameController {
         this.isBotFirst = isBotFirst;
 
         // Start bot
-        this.bot = new Bot();
+        this.bot = new Bot(this.buttons, "O");
         this.playerXTurn = !isBotFirst;
         if (this.isBotFirst) {
             this.moveBot();
