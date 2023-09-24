@@ -49,8 +49,12 @@ public class OutputFrameController {
     private int playerXScore;
     private int playerOScore;
     private int roundsLeft;
-    private boolean isBotFirst;
-    private Bot bot;
+    private boolean isPlayerOFirst;
+    private Bot botPlayerO;
+
+    private Bot botPlayerX;
+
+    private boolean gameEnded = false;
 
 
     private static final int ROW = 8;
@@ -74,13 +78,27 @@ public class OutputFrameController {
         this.playerOName.setText(name2);
         this.roundsLeftLabel.setText(rounds);
         this.roundsLeft = Integer.parseInt(rounds);
-        this.isBotFirst = isBotFirst;
+        this.isPlayerOFirst = isBotFirst;
 
         // Start bot
-        this.bot = new Bot(this.buttons, "O");
+        this.botPlayerO = new Bot(this.buttons, "O");
         this.playerXTurn = !isBotFirst;
-        if (this.isBotFirst) {
-            this.moveBot();
+
+        if (this.isPlayerOFirst) {
+            this.moveBotO();
+        }
+
+        // Todo: modify this to determine which bot to use for testing
+        if (name1.equals("Bot")) {
+            this.botPlayerX = new Bot(this.buttons, "X");
+
+            while(!this.gameEnded) {
+                if (this.playerXTurn) {
+                    this.moveBotX();
+                } else {
+                    this.moveBotO();
+                }
+            }
         }
     }
 
@@ -187,17 +205,17 @@ public class OutputFrameController {
                 this.updateGameBoard(i, j);
                 this.playerXTurn = false;         // Alternate player's turn.
 
-                if (isBotFirst) {
+                if (isPlayerOFirst) {
                     this.roundsLeft--; // Decrement the number of rounds left after both Player X & Player O have played.
                     this.roundsLeftLabel.setText(String.valueOf(this.roundsLeft));
                 }
 
-                if (isBotFirst && this.roundsLeft == 0) {
+                if (isPlayerOFirst && this.roundsLeft == 0) {
                     this.endOfGame();
                 }
 
                 // Bot's turn
-                this.moveBot();
+                this.moveBotO();
             }
             else {
                 this.playerXBoxPane.setStyle("-fx-background-color: #90EE90; -fx-border-color: #D3D3D3;");
@@ -208,12 +226,12 @@ public class OutputFrameController {
                 this.updateGameBoard(i, j);
                 this.playerXTurn = true;
 
-                if (!isBotFirst) {
+                if (!isPlayerOFirst) {
                     this.roundsLeft--; // Decrement the number of rounds left after both Player X & Player O have played.
                     this.roundsLeftLabel.setText(String.valueOf(this.roundsLeft));
                 }
 
-                if (!isBotFirst && this.roundsLeft == 0) { // Game has terminated.
+                if (!isPlayerOFirst && this.roundsLeft == 0) { // Game has terminated.
                     this.endOfGame();       // Determine & announce the winner.
                 }
             }
@@ -319,6 +337,8 @@ public class OutputFrameController {
         for (int i = 0; i < ROW; i++)
             for (int j = 0; j < COL; j++)
                 this.buttons[i][j].setDisable(true);
+
+        this.gameEnded = true;
     }
 
 
@@ -352,8 +372,24 @@ public class OutputFrameController {
         primaryStage.show();
     }
 
-    private void moveBot() {
-        int[] botMove = this.bot.move();
+    private void moveBotO() {
+        int[] botMove = this.botPlayerO.move();
+
+        int i = botMove[0];
+        int j = botMove[1];
+
+        if (!this.buttons[i][j].getText().equals("")) {
+            new Alert(Alert.AlertType.ERROR, "Bot Invalid Coordinates. Exiting.").showAndWait();
+            System.exit(1);
+            return;
+        }
+
+        this.selectedCoordinates(i, j);
+    }
+
+    private void moveBotX() {
+        int[] botMove = this.botPlayerX.move();
+
         int i = botMove[0];
         int j = botMove[1];
 

@@ -7,7 +7,6 @@ import javafx.stage.Stage;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -24,10 +23,10 @@ public class InputFrameController{
 
     public CheckBox isBotFirst;
     @FXML
-    private TextField player1;
+    private ComboBox<String> player1;
 
     @FXML
-    private TextField player2;
+    private ComboBox<String> player2;
 
     @FXML
     private ComboBox<String> numberOfRounds;
@@ -45,6 +44,15 @@ public class InputFrameController{
                 "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28");
         this.numberOfRounds.setItems(numberOfRoundsDropdown);
         this.numberOfRounds.getSelectionModel().select(0);
+
+        ObservableList<String> player1Dropdown = FXCollections.observableArrayList("Human", "Bot");
+        ObservableList<String> player2Dropdown = FXCollections.observableArrayList("Bot");
+
+        this.player1.setItems(player1Dropdown);
+        this.player1.getSelectionModel().select(0);
+
+        this.player2.setItems(player2Dropdown);
+        this.player2.getSelectionModel().select(0);
     }
 
 
@@ -55,8 +63,8 @@ public class InputFrameController{
      */
     @FXML
     private void reset(){
-        this.player1.setText("");
-        this.player2.setText("");
+        this.player1.setValue(null);
+        this.player2.setValue(null);
         this.numberOfRounds.getSelectionModel().select(0);
     }
 
@@ -80,7 +88,7 @@ public class InputFrameController{
 
             // Get controller of output frame and pass input including player names and number of rounds chosen.
             OutputFrameController outputFC = loader.getController();
-            outputFC.getInput(this.player1.getText(), this.player2.getText(), this.numberOfRounds.getValue(), this.isBotFirst.isSelected());
+            outputFC.getInput(this.player1.getValue(), this.player2.getValue(), this.numberOfRounds.getValue(), this.isBotFirst.isSelected());
 
             // Open the new frame.
             Stage secondaryStage = new Stage();
@@ -99,8 +107,8 @@ public class InputFrameController{
      *
      */
     private boolean isInputFieldValidated() {
-        String playerX = this.player1.getText();
-        String playerO = this.player2.getText();
+        String playerX = this.player1.getValue();
+        String playerO = this.player2.getValue();
         String roundNumber = this.numberOfRounds.getValue();
 
         if (playerX.length() == 0) {
@@ -113,10 +121,10 @@ public class InputFrameController{
             return false;
         }
 
-        if (playerX.equals(playerO)){
-            new Alert(Alert.AlertType.ERROR, "Player 1 and Player 2 cannot have the same name.").showAndWait();
-            return false;
-        }
+//        if (playerX.equals(playerO)){
+//            new Alert(Alert.AlertType.ERROR, "Player 1 and Player 2 cannot have the same name.").showAndWait();
+//            return false;
+//        }
 
         if (roundNumber.length() == 0) {
             new Alert(Alert.AlertType.ERROR, "Number of rounds dropdown menu is blank.").showAndWait();
