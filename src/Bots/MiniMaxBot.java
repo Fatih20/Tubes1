@@ -18,16 +18,7 @@ public class MiniMaxBot extends Bot {
 
         while (i < 8) {
             if (state.getGameBoardMatrix()[i][j] == 0) {
-                try {
-                    System.out.print("Coordinates chosen : ");
-                    System.out.print(i);
-                    System.out.print(", ");
-                    System.out.print(j);
-                    System.out.println();
-                    this.getGameState().play(i, j, isPlayerOne());
-                    return new int[]{i, j};
-                } catch (GameStateException.IllegalMove | GameStateException.RowColumnOverFlow ignored) {
-                }
+                return new int[]{i, j};
             }
 
             j++;

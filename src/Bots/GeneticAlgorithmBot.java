@@ -18,11 +18,8 @@ public class GeneticAlgorithmBot extends Bot {
 
         while (i < 8) {
             if (state.getGameBoardMatrix()[i][j] == 0) {
-                try {
-                    this.getGameState().play(i, j, isPlayerOne());
-                    return new int[]{i, j};
-                } catch (GameStateException.IllegalMove | GameStateException.RowColumnOverFlow ignored) {
-                }
+                return new int[]{i, j};
+
             }
 
             j++;
