@@ -1,21 +1,20 @@
 package Bots;
 
-import javafx.scene.control.Button;
+import GameStateBetter.GameStateBetter;
 
 public class MiniMaxBot extends Bot{
-    public MiniMaxBot(Button[][] buttons, String playerType) {
-        super(buttons, playerType);
-    }
+    public MiniMaxBot(GameStateBetter gameState, String playerType) {
+        super(gameState, playerType);}
 
     public int[] move() {
         // find first empty tile
-        var state = this.getState();
+        var state = this.getGameState();
 
         int i = 0;
         int j = 0;
 
         while (i < 8) {
-            if (state[i][j].equals("")) {
+            if (state.getGameBoardMatrix()[i][j] == 0) {
                 return new int[]{i, j};
             }
 
