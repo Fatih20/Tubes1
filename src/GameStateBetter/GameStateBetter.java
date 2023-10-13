@@ -1,11 +1,9 @@
 package GameStateBetter;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 @FunctionalInterface
-interface scoreIncrementor{
+interface scoreIncrementor {
     void execute();
 }
 
@@ -15,6 +13,7 @@ public class GameStateBetter {
     private int xScore = 0;
 
     private int[][] gameBoardMatrix;
+
     public GameStateBetter(String[][] gameStateShittier) {
         gameBoardMatrix = new int[8][8];
         for (int i = 0; i < 8; i++) {
@@ -63,8 +62,16 @@ public class GameStateBetter {
         int playerValue = isPlayerOne ? 1 : 2;
         int opponentValue = !(isPlayerOne) ? 1 : 2;
 
-        scoreIncrementor incrementPlayerScore = isPlayerOne ? () -> {xScore++;} : () -> {oScore++;};
-        scoreIncrementor decrementOpponentScore = !(isPlayerOne) ? () -> {xScore--;} : () -> {oScore--;};
+        scoreIncrementor incrementPlayerScore = isPlayerOne ? () -> {
+            xScore++;
+        } : () -> {
+            oScore++;
+        };
+        scoreIncrementor decrementOpponentScore = !(isPlayerOne) ? () -> {
+            xScore--;
+        } : () -> {
+            oScore--;
+        };
 
         if (gameBoardMatrix[row][column] != 0) {
             throw new GameStateException.IllegalMove();
@@ -84,7 +91,7 @@ public class GameStateBetter {
             int rowNeighbor = cellNeighbor[0];
             int columnNeighbor = cellNeighbor[1];
             if (rowNeighbor >= 0 && rowNeighbor < 8 && columnNeighbor >= 0 && columnNeighbor < 8) {
-                validNeighbors.add(new int[] {cellNeighbor[0], cellNeighbor[1]});
+                validNeighbors.add(new int[]{cellNeighbor[0], cellNeighbor[1]});
             }
         }
 

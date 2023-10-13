@@ -4,9 +4,10 @@ import GameStateBetter.GameStateException;
 import javafx.scene.control.Button;
 
 
-public class MiniMaxBot extends Bot{
+public class MiniMaxBot extends Bot {
     public MiniMaxBot(Button[][] buttons, String playerType) {
-        super(buttons, playerType);}
+        super(buttons, playerType);
+    }
 
     public int[] move() {
         // find first empty tile
@@ -32,6 +33,6 @@ public class MiniMaxBot extends Bot{
             }
         }
 
-        return new int[]{0,0};
+        return new int[]{0, 0};
     }
 }
