@@ -1,20 +1,20 @@
 package Bots;
 
 import GameStateBetter.GameStateBetter;
-import GameStateBetter.GameStateException;
 import javafx.scene.control.Button;
 
 abstract public class Bot implements Runnable {
-    private final GameStateBetter gameState;
+    private GameStateBetter gameState;
 
 
-    public boolean isPlayerOne() {
-        return isPlayerOne;
-    }
 
-    private boolean isPlayerOne;
+    private final boolean isPlayerOne;
 
     private int[] lastMove;
+
+    public Bot(String playerType) {
+        this.isPlayerOne = playerType.equalsIgnoreCase("x");
+    }
 
     public Bot(Button[][] buttons, String playerType) {
         this.gameState = new GameStateBetter(buttons);
@@ -37,10 +37,18 @@ abstract public class Bot implements Runnable {
         return gameState;
     }
 
+    public void setGameState(GameStateBetter gameState) {
+        this.gameState = gameState;
+    }
+
     @Override
     public void run() {
         System.out.println("Peforming move");
         this.lastMove = this.move();
+    }
+
+    public boolean isPlayerOne() {
+        return isPlayerOne;
     }
 
     public void emergencyMove() {

@@ -14,6 +14,8 @@ public class GameStateBetter {
     private int oScore = 0;
     private int xScore = 0;
 
+    private boolean playerOneTurn;
+
     private int[][] gameBoardMatrix;
 
     private Button[][] buttons;
@@ -33,8 +35,21 @@ public class GameStateBetter {
                 }
             }
         }
+
+        this.playerOneTurn = true;
     }
 
+    public boolean isPlayerOneTurn() {
+        return playerOneTurn;
+    }
+
+    public void alternateTurn() {
+        playerOneTurn = !playerOneTurn;
+    }
+
+    public void setPlayerOneTurn(boolean playerOneTurn) {
+        this.playerOneTurn = playerOneTurn;
+    }
 
     public int getEmptyBox() {
         return emptyBox;

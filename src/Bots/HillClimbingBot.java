@@ -1,13 +1,10 @@
 package Bots;
 
-import GameStateBetter.GameStateException;
-import javafx.scene.control.Button;
-
 public class HillClimbingBot extends Bot {
-
-    public HillClimbingBot(Button[][] buttons, String playerType) {
-        super(buttons, playerType);
+    public HillClimbingBot(String playerType) {
+        super(playerType);
     }
+
 
     public int[] move() {
         // find first empty tile
