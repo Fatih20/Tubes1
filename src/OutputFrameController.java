@@ -1,5 +1,6 @@
 import Bots.Bot;
 import Bots.BotFactory;
+import GameStateBetter.GameStateException;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Cursor;
@@ -393,6 +394,17 @@ public class OutputFrameController {
             return;
         }
 
+        try {
+            System.out.println("Updating bot game states");
+            if (bot.isPlayerOne()) {
+            this.botPlayerO.getGameState().play(i, j, bot.isPlayerOne());
+            } else {
+            this.botPlayerX.getGameState().play(i, j, bot.isPlayerOne());
+            }
+        } catch (GameStateException.IllegalMove | GameStateException.RowColumnOverFlow ignored) {
+
+        }
         this.selectedCoordinates(i, j);
+
     }
 }

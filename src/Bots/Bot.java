@@ -1,6 +1,7 @@
 package Bots;
 
 import GameStateBetter.GameStateBetter;
+import GameStateBetter.GameStateException;
 import javafx.scene.control.Button;
 
 abstract public class Bot implements Runnable {
@@ -60,7 +61,11 @@ abstract public class Bot implements Runnable {
 
         while (i < 8) {
             if (state.getGameBoardMatrix()[i][j] == 0) {
-                this.lastMove = new int[]{i, j};
+                try {
+                    this.getGameState().play(i, j, isPlayerOne());
+                    this.lastMove = new int[]{i, j};
+                } catch (GameStateException.IllegalMove | GameStateException.RowColumnOverFlow ignored) {
+                }
             }
 
             j++;

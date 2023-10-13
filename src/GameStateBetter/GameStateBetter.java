@@ -13,7 +13,6 @@ public class GameStateBetter {
     private int xScore = 0;
 
     private int[][] gameBoardMatrix;
-
     public GameStateBetter(String[][] gameStateShittier) {
         gameBoardMatrix = new int[8][8];
         for (int i = 0; i < 8; i++) {
@@ -46,13 +45,17 @@ public class GameStateBetter {
         return gameBoardMatrix;
     }
 
-    private void validateMove(int row, int column) throws GameStateException.RowColumnOverFlow {
+    private void validateMove(int row, int column) throws GameStateException.RowColumnOverFlow, GameStateException.IllegalMove {
         if (row >= 8 || row < 0) {
             throw new GameStateException.RowColumnOverFlow();
         }
 
         if (column >= 8 || column < 0) {
             throw new GameStateException.RowColumnOverFlow();
+        }
+
+        if (gameBoardMatrix[row][column] != 0) {
+            throw new GameStateException.IllegalMove();
         }
     }
 
@@ -78,11 +81,7 @@ public class GameStateBetter {
         }
 
         gameBoardMatrix[row][column] = playerValue;
-        if (isPlayerOne) {
-            xScore++;
-        } else {
-            oScore++;
-        }
+        incrementPlayerScore.execute();
 
         int[][] cellNeighbors = {{row - 1, column}, {row + 1, column}, {row, column - 1}, {row, column + 1}};
         ArrayList<int[]> validNeighbors = new ArrayList<>();
@@ -91,7 +90,7 @@ public class GameStateBetter {
             int rowNeighbor = cellNeighbor[0];
             int columnNeighbor = cellNeighbor[1];
             if (rowNeighbor >= 0 && rowNeighbor < 8 && columnNeighbor >= 0 && columnNeighbor < 8) {
-                validNeighbors.add(new int[]{cellNeighbor[0], cellNeighbor[1]});
+                validNeighbors.add(new int[] {cellNeighbor[0], cellNeighbor[1]});
             }
         }
 
