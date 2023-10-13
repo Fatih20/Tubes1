@@ -27,3 +27,5 @@ out
 
 javafx-sdk-linux
 javafx-sdk
+
+*.iml
