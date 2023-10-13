@@ -15,9 +15,9 @@ import javafx.scene.layout.RowConstraints;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -369,16 +369,16 @@ public class OutputFrameController {
     }
 
     private void moveBot(Bot bot) {
-        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-        Future<?> future = executor.submit(bot);
-        Runnable cancelTask = () -> {
-            if (!future.isDone()) {
-                future.cancel(true);
-                bot.emergencyMove();
-            }
-        };
+        ExecutorService executor = Executors.newSingleThreadExecutor();
 
-        executor.schedule(cancelTask, 5, TimeUnit.SECONDS);
+        Future<?> future = executor.submit(bot);
+
+        try {
+            future.get(5, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            System.out.println("Wait timeout");
+            bot.emergencyMove();
+        }
 
         executor.shutdown();
 

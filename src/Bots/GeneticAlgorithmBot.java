@@ -2,7 +2,7 @@ package Bots;
 
 import javafx.scene.control.Button;
 
-public class GeneticAlgorithmBot extends Bot{
+public class GeneticAlgorithmBot extends Bot {
     public GeneticAlgorithmBot(Button[][] buttons, String playerType) {
         super(buttons, playerType);
     }
@@ -28,6 +28,6 @@ public class GeneticAlgorithmBot extends Bot{
             }
         }
 
-        return new int[]{0,0};
+        return new int[]{0, 0};
     }
 }
