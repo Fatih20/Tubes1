@@ -8,7 +8,7 @@ public class BotFactory {
             case "Minimax Bot":
                 return new MiniMaxBot(buttons, playerType);
             case "Simulated Annealing Bot":
-                return new SimulatedAnnealingBot(buttons, playerType);
+                return new HillClimbingBot(buttons, playerType);
             case "Genetic Algorithm Bot":
                 return new GeneticAlgorithmBot(buttons, playerType);
         }

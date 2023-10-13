@@ -3,9 +3,11 @@ package Bots;
 import GameStateBetter.GameStateException;
 import javafx.scene.control.Button;
 
-public class SimulatedAnnealingBot extends Bot{
-    public SimulatedAnnealingBot(Button[][] buttons, String playerType) {
-        super(buttons, playerType);}
+public class HillClimbingBot extends Bot {
+
+    public HillClimbingBot(Button[][] buttons, String playerType) {
+        super(buttons, playerType);
+    }
 
     public int[] move() {
         // find first empty tile
@@ -31,6 +33,6 @@ public class SimulatedAnnealingBot extends Bot{
             }
         }
 
-        return new int[]{0,0};
+        return new int[]{0, 0};
     }
 }
