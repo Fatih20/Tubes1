@@ -1,5 +1,7 @@
 package GameStateBetter;
 
+import javafx.scene.control.Button;
+
 import java.util.ArrayList;
 
 @FunctionalInterface
@@ -12,12 +14,18 @@ public class GameStateBetter {
     private int oScore = 0;
     private int xScore = 0;
 
+    private boolean playerOneTurn;
+
     private int[][] gameBoardMatrix;
-    public GameStateBetter(String[][] gameStateShittier) {
+
+    private Button[][] buttons;
+
+    public GameStateBetter(Button[][] buttonMatrix) {
+        this.buttons = buttonMatrix;
         gameBoardMatrix = new int[8][8];
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                String content = gameStateShittier[i][j];
+                String content = buttonMatrix[i][j].getText();
                 if (content.equalsIgnoreCase("X")) {
                     gameBoardMatrix[i][j] = 1;
                 } else if (content.equalsIgnoreCase("O")) {
@@ -27,6 +35,20 @@ public class GameStateBetter {
                 }
             }
         }
+
+        this.playerOneTurn = true;
+    }
+
+    public boolean isPlayerOneTurn() {
+        return playerOneTurn;
+    }
+
+    public void alternateTurn() {
+        playerOneTurn = !playerOneTurn;
+    }
+
+    public void setPlayerOneTurn(boolean playerOneTurn) {
+        this.playerOneTurn = playerOneTurn;
     }
 
     public int getEmptyBox() {
@@ -39,6 +61,22 @@ public class GameStateBetter {
 
     public int getxScore() {
         return xScore;
+    }
+
+    public void incrementxScore() {
+        xScore++;
+    }
+
+    public void decrementxScore() {
+        xScore--;
+    }
+
+    public void incrementoScore() {
+        oScore++;
+    }
+
+    public void decrementoScore() {
+        oScore--;
     }
 
     public int[][] getGameBoardMatrix() {
@@ -65,22 +103,18 @@ public class GameStateBetter {
         int playerValue = isPlayerOne ? 1 : 2;
         int opponentValue = !(isPlayerOne) ? 1 : 2;
 
-        scoreIncrementor incrementPlayerScore = isPlayerOne ? () -> {
-            xScore++;
-        } : () -> {
-            oScore++;
-        };
-        scoreIncrementor decrementOpponentScore = !(isPlayerOne) ? () -> {
-            xScore--;
-        } : () -> {
-            oScore--;
-        };
+        String playerText = isPlayerOne ? "X" : "O";
+        String opponentText = !isPlayerOne ? "X" : "O";
+
+        scoreIncrementor incrementPlayerScore = isPlayerOne ? this::incrementxScore : this::incrementoScore;
+        scoreIncrementor decrementOpponentScore = !(isPlayerOne) ? this::decrementxScore : this::decrementoScore;
 
         if (gameBoardMatrix[row][column] != 0) {
             throw new GameStateException.IllegalMove();
         }
 
         gameBoardMatrix[row][column] = playerValue;
+        buttons[row][column].setText(playerText);
         incrementPlayerScore.execute();
 
         int[][] cellNeighbors = {{row - 1, column}, {row + 1, column}, {row, column - 1}, {row, column + 1}};
@@ -100,11 +134,13 @@ public class GameStateBetter {
             int neighborCell = gameBoardMatrix[validNeighbor[0]][validNeighbor[1]];
             if (neighborCell == opponentValue) {
                 gameBoardMatrix[rowNeighbor][columnNeighbor] = playerValue;
+                buttons[rowNeighbor][columnNeighbor].setText(playerText);
                 incrementPlayerScore.execute();
                 decrementOpponentScore.execute();
             } else if (gameBoardMatrix[validNeighbor[0]][validNeighbor[1]] == 0) {
                 incrementPlayerScore.execute();
                 gameBoardMatrix[rowNeighbor][columnNeighbor] = playerValue;
+                buttons[rowNeighbor][columnNeighbor].setText(playerText);
                 emptyBox--;
             }
         }

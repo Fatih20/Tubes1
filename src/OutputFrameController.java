@@ -1,5 +1,6 @@
 import Bots.Bot;
 import Bots.BotFactory;
+import GameStateBetter.GameStateBetter;
 import GameStateBetter.GameStateException;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -50,22 +51,22 @@ public class OutputFrameController {
     private Label playerOScoreLabel;
 
 
-    private boolean playerXTurn;
-    private int playerXScore;
-    private int playerOScore;
     private int roundsLeft;
     private boolean isPlayerOFirst;
     private Bot botPlayerO;
 
     private Bot botPlayerX;
 
+    private boolean bothBot;
+
     private boolean gameEnded = false;
+
+    private GameStateBetter gameState;
 
 
     private static final int ROW = 8;
     private static final int COL = 8;
     private final Button[][] buttons = new Button[ROW][COL];
-
 
     /**
      * Set the name of player X (player) to be name1, set the name of player O (bot) to be name2,
@@ -78,44 +79,37 @@ public class OutputFrameController {
      * @param isBotFirst True if bot is first, false otherwise.
      */
     void getInput(String name1, String name2, String rounds, boolean isBotFirst) {
-        this.playerXName.setText(name1);
-        this.playerOName.setText(name2);
         this.roundsLeftLabel.setText(rounds);
         this.roundsLeft = Integer.parseInt(rounds);
+        this.bothBot = !name1.equals("Human");
         this.isPlayerOFirst = isBotFirst;
 
-        // Start bot
-        this.botPlayerO = BotFactory.getBot(this.buttons, name2, "O");
-        this.playerXTurn = !isBotFirst;
+        this.botPlayerO = BotFactory.getBot(name2, "O");
+        assert botPlayerO != null;
+        botPlayerO.setGameState(gameState);
 
-        if (this.isPlayerOFirst) {
-            assert this.botPlayerO != null;
-            this.moveBot(this.botPlayerO);
+        if (bothBot) {
+            this.botPlayerX = BotFactory.getBot(name1, "X");
+            assert this.botPlayerX != null;
+            this.botPlayerX.setGameState(gameState);
         }
 
-        if (!name1.equals("Human")) {
-            this.botPlayerX = BotFactory.getBot(this.buttons, name1, "X");
+        this.playerXName.setText(name1);
+        this.playerOName.setText(name2);
 
-            while (!this.gameEnded) {
-                if (this.playerXTurn) {
-                    assert this.botPlayerX != null;
-                    this.moveBot(this.botPlayerX);
-                } else {
-                    assert this.botPlayerO != null;
-                    this.moveBot(this.botPlayerO);
-                }
-            }
-        }
+        this.gameState.setPlayerOneTurn(!isBotFirst);
+        startGame();
+
     }
 
 
     /**
-     * Construct the 8x8 game board by creating a total of 64 buttons in a 2
-     * dimensional array, and construct the 8x2 score board for scorekeeping
+     * Construct the 8x8 game board by creating a total of 64 buttons in a 2-dimensional array, and construct the 8x2 score board for scorekeeping
      * and then initialize turn and score.
      */
     @FXML
     private void initialize() {
+
         // Construct game board with 8 rows.
         for (int i = 0; i < ROW; i++) {
             RowConstraints rowConst = new RowConstraints();
@@ -145,17 +139,18 @@ public class OutputFrameController {
                 this.buttons[i][j].setOnAction(event -> this.selectedCoordinates(finalI, finalJ));
             }
         }
-
         // Setting up the initial game board with 4 X's in bottom left corner and 4 O's in top right corner.
         this.buttons[ROW - 2][0].setText("X");
         this.buttons[ROW - 1][0].setText("X");
         this.buttons[ROW - 2][1].setText("X");
         this.buttons[ROW - 1][1].setText("X");
+
         this.buttons[0][COL - 2].setText("O");
         this.buttons[0][COL - 1].setText("O");
         this.buttons[1][COL - 2].setText("O");
         this.buttons[1][COL - 1].setText("O");
 
+        this.gameState = new GameStateBetter(buttons);
 
         // Construct score board with 8 rows.
         for (int i = 0; i < ROW; i++) {
@@ -171,16 +166,21 @@ public class OutputFrameController {
             this.scoreBoard.getColumnConstraints().add(colConst);
         }
 
-
         // Initialize turn and score for the game.
         this.playerXBoxPane.setStyle("-fx-background-color: #90EE90; -fx-border-color: #D3D3D3;");
         this.playerOBoxPane.setStyle("-fx-background-color: white; -fx-border-color: #D3D3D3;");
-        this.playerXScoreLabel.setText("4");
-        this.playerOScoreLabel.setText("4");
+        this.playerXScoreLabel.setText(String.valueOf(this.gameState.getxScore()));
+        this.playerOScoreLabel.setText(String.valueOf(this.gameState.getoScore()));
 
-        this.playerXTurn = true;
-        this.playerXScore = 4;
-        this.playerOScore = 4;
+    }
+
+    private void startGame() {
+        if (!gameState.isPlayerOneTurn()) {
+            moveBot(botPlayerO);
+        } else if (bothBot) {
+            moveBot(botPlayerX);
+        }
+
     }
 
 
@@ -192,112 +192,68 @@ public class OutputFrameController {
      */
     private void selectedCoordinates(int i, int j) {
         // Invalid when a button with an X or an O is clicked.
-        if (!this.buttons[i][j].getText().equals(""))
+        try {
+            this.gameState.play(i, j, this.gameState.isPlayerOneTurn());
+        } catch (GameStateException.RowColumnOverFlow | GameStateException.IllegalMove e) {
             new Alert(Alert.AlertType.ERROR, "Invalid coordinates: Try again!").showAndWait();
-            // Button must be blank.
-        else {
-            if (this.playerXTurn) {
-                // Changed background color to green to indicate next player's turn.
-                this.playerXBoxPane.setStyle("-fx-background-color: WHITE; -fx-border-color: #D3D3D3;");
-                this.playerOBoxPane.setStyle("-fx-background-color: #90EE90; -fx-border-color: #D3D3D3;");
-                this.buttons[i][j].setText("X");  // Mark the board with X.
-                this.playerXScore++;              // Increment the score of player X.
+        }
 
-                // Update game board by changing surrounding cells to X if applicable.
-                this.updateGameBoard(i, j);
-                this.playerXTurn = false;         // Alternate player's turn.
+        this.updateScoreBoard();
 
-                if (isPlayerOFirst) {
-                    this.roundsLeft--; // Decrement the number of rounds left after both Player X & Player O have played.
-                    this.roundsLeftLabel.setText(String.valueOf(this.roundsLeft));
-                }
+        if ((gameState.isPlayerOneTurn() && isPlayerOFirst) || !(gameState.isPlayerOneTurn() || isPlayerOFirst)) {
+            this.roundsLeft--; // Decrement the number of rounds left after both Player X & Player O have played.
+            this.roundsLeftLabel.setText(String.valueOf(this.roundsLeft));
+        }
 
-                if (isPlayerOFirst && this.roundsLeft == 0) {
-                    this.endOfGame();
-                }
+        if (this.gameState.isPlayerOneTurn()) {
+            // Changed background color to green to indicate next player's turn.
+            this.playerXBoxPane.setStyle("-fx-background-color: WHITE; -fx-border-color: #D3D3D3;");
+            this.playerOBoxPane.setStyle("-fx-background-color: #90EE90; -fx-border-color: #D3D3D3;");
 
-                assert this.botPlayerO != null;
-                this.moveBot(this.botPlayerO);
-            } else {
-                this.playerXBoxPane.setStyle("-fx-background-color: #90EE90; -fx-border-color: #D3D3D3;");
-                this.playerOBoxPane.setStyle("-fx-background-color: WHITE; -fx-border-color: #D3D3D3;");
-                this.buttons[i][j].setText("O");
-                this.playerOScore++;
-
-                this.updateGameBoard(i, j);
-                this.playerXTurn = true;
-
-                if (!isPlayerOFirst) {
-                    this.roundsLeft--; // Decrement the number of rounds left after both Player X & Player O have played.
-                    this.roundsLeftLabel.setText(String.valueOf(this.roundsLeft));
-                }
-
-                if (!isPlayerOFirst && this.roundsLeft == 0) { // Game has terminated.
-                    this.endOfGame();       // Determine & announce the winner.
-                }
+            if (isPlayerOFirst && this.roundsLeft == 0) {
+                this.endOfGame();
             }
+
+        } else {
+            this.playerXBoxPane.setStyle("-fx-background-color: #90EE90; -fx-border-color: #D3D3D3;");
+            this.playerOBoxPane.setStyle("-fx-background-color: WHITE; -fx-border-color: #D3D3D3;");
+
+            if (!isPlayerOFirst && this.roundsLeft == 0) { // Game has terminated.
+                this.endOfGame();       // Determine & announce the winner.
+            }
+        }
+
+        this.gameState.alternateTurn();
+
+        if (!gameState.isPlayerOneTurn()) {
+            moveBot(botPlayerO);
+        } else if (bothBot) {
+            moveBot(botPlayerX);
         }
     }
 
-    /**
-     * Change adjacent cells to X's or O's.
-     *
-     * @param i The row number of the button clicked.
-     * @param j The column number of the button clicked.
-     */
-    private void updateGameBoard(int i, int j) {
-        // Value of indices to control the lower/upper bound of rows and columns
-        // in order to change surrounding/adjacent X's and O's only on the game board.
-        // Four boundaries:  First & last row and first & last column.
-
-        int startRow, endRow, startColumn, endColumn;
-
-        if (i - 1 < 0)     // If clicked button in first row, no preceding row exists.
-            startRow = i;
-        else               // Otherwise, the preceding row exists for adjacency.
-            startRow = i - 1;
-
-        if (i + 1 >= ROW)  // If clicked button in last row, no subsequent/further row exists.
-            endRow = i;
-        else               // Otherwise, the subsequent row exists for adjacency.
-            endRow = i + 1;
-
-        if (j - 1 < 0)     // If clicked on first column, lower bound of the column has been reached.
-            startColumn = j;
-        else
-            startColumn = j - 1;
-
-        if (j + 1 >= COL)  // If clicked on last column, upper bound of the column has been reached.
-            endColumn = j;
-        else
-            endColumn = j + 1;
 
 
-        // Search for adjacency for X's and O's or vice versa, and replace them.
-        // Update scores for X's and O's accordingly.
-        for (int x = startRow; x <= endRow; x++) {
-            this.setPlayerScore(x, j);
-        }
-
-        for (int y = startColumn; y <= endColumn; y++) {
-            this.setPlayerScore(i, y);
-        }
-
-        this.playerXScoreLabel.setText(String.valueOf(this.playerXScore));
-        this.playerOScoreLabel.setText(String.valueOf(this.playerOScore));
+    private void updateScoreBoard() {
+        this.playerXScoreLabel.setText(String.valueOf(this.gameState.getxScore()));
+        this.playerOScoreLabel.setText(String.valueOf(this.gameState.getoScore()));
     }
 
-    private void setPlayerScore(int i, int j) {
-        if (this.playerXTurn) {
-            if (this.buttons[i][j].getText().equals("O")) {
-                this.buttons[i][j].setText("X");
-                this.playerXScore++;
-                this.playerOScore--;
+    private void updateEntireButtons() {
+        for (int i = 0; i < ROW; i++) {
+            for (int j = 0; j < COL; j++) {
+                Button button = buttons[i][j];
+                button.setText("");
+                int boxContent = gameState.getGameBoardMatrix()[i][j];
+
+                if (boxContent == 2) {
+                    button.setText("X");
+                } else if (boxContent == 1) {
+                    button.setText("O");
+                } else {
+                    button.setText("");
+                }
             }
-        } else if (this.buttons[i][j].getText().equals("X")) {
-            this.buttons[i][j].setText("O");
-            this.playerOScore++;
-            this.playerXScore--;
         }
     }
 
@@ -307,7 +263,7 @@ public class OutputFrameController {
      */
     private void endOfGame() {
         // Player X is the winner.
-        if (this.playerXScore > this.playerOScore) {
+        if (this.gameState.getxScore() > this.gameState.getoScore()) {
             new Alert(Alert.AlertType.INFORMATION,
                     this.playerXName.getText() + " has won the game!").showAndWait();
             this.playerXBoxPane.setStyle("-fx-background-color: CYAN; -fx-border-color: #D3D3D3;");
@@ -316,7 +272,7 @@ public class OutputFrameController {
         }
 
         // Player O is the winner,
-        else if (this.playerOScore > this.playerXScore) {
+        else if (this.gameState.getoScore() > this.gameState.getxScore()) {
             new Alert(Alert.AlertType.INFORMATION,
                     this.playerOName.getText() + " has won the game!").showAndWait();
             this.playerXBoxPane.setStyle("-fx-background-color: WHITE; -fx-border-color: #D3D3D3;");
@@ -333,9 +289,11 @@ public class OutputFrameController {
         }
 
         // Disable the game board buttons to prevent from playing further.
-        for (int i = 0; i < ROW; i++)
-            for (int j = 0; j < COL; j++)
+        for (int i = 0; i < ROW; i++) {
+            for (int j = 0; j < COL; j++) {
                 this.buttons[i][j].setDisable(true);
+            }
+        }
 
         this.gameEnded = true;
     }
@@ -388,22 +346,12 @@ public class OutputFrameController {
         int i = botMove[0];
         int j = botMove[1];
 
-        if (!this.buttons[i][j].getText().equals("")) {
+        if (!this.buttons[i][j].getText().isEmpty()) {
             new Alert(Alert.AlertType.ERROR, "Bot Invalid Coordinates. Exiting.").showAndWait();
             System.exit(1);
             return;
         }
 
-        try {
-            System.out.println("Updating bot game states");
-            if (bot.isPlayerOne()) {
-            this.botPlayerO.getGameState().play(i, j, bot.isPlayerOne());
-            } else {
-            this.botPlayerX.getGameState().play(i, j, bot.isPlayerOne());
-            }
-        } catch (GameStateException.IllegalMove | GameStateException.RowColumnOverFlow ignored) {
-
-        }
         this.selectedCoordinates(i, j);
 
     }

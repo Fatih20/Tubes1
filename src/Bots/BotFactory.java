@@ -1,16 +1,14 @@
 package Bots;
 
-import javafx.scene.control.Button;
-
 public class BotFactory {
-    public static Bot getBot(Button[][] buttons, String name, String playerType) {
+    public static Bot getBot(String name, String playerType) {
         switch (name) {
             case "Minimax Bot":
-                return new MiniMaxBot(buttons, playerType);
+                return new MiniMaxBot(playerType);
             case "Hill Climbing Bot":
-                return new HillClimbingBot(buttons, playerType);
+                return new HillClimbingBot(playerType);
             case "Genetic Algorithm Bot":
-                return new GeneticAlgorithmBot(buttons, playerType);
+                return new GeneticAlgorithmBot(playerType);
         }
 
         return null;

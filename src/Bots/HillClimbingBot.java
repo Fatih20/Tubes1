@@ -1,13 +1,10 @@
 package Bots;
 
-import GameStateBetter.GameStateException;
-import javafx.scene.control.Button;
-
 public class HillClimbingBot extends Bot {
-
-    public HillClimbingBot(Button[][] buttons, String playerType) {
-        super(buttons, playerType);
+    public HillClimbingBot(String playerType) {
+        super(playerType);
     }
+
 
     public int[] move() {
         // find first empty tile
@@ -18,11 +15,7 @@ public class HillClimbingBot extends Bot {
 
         while (i < 8) {
             if (state.getGameBoardMatrix()[i][j] == 0) {
-                try {
-                    this.getGameState().play(i, j, isPlayerOne());
-                    return new int[]{i, j};
-                } catch (GameStateException.IllegalMove | GameStateException.RowColumnOverFlow ignored) {
-                }
+                return new int[]{i, j};
             }
 
             j++;
