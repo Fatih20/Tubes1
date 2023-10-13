@@ -2,8 +2,8 @@ package Bots;
 
 import GameStateBetter.GameStateBetter;
 
-public class LocalSearchBot extends Bot{
-    public LocalSearchBot(GameStateBetter gameState, String playerType) {
+public class SimulatedAnnealingBot extends Bot{
+    public SimulatedAnnealingBot(GameStateBetter gameState, String playerType) {
         super(gameState, playerType);}
 
     public int[] move() {
