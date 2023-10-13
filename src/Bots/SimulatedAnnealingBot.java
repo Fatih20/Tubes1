@@ -1,10 +1,10 @@
 package Bots;
 
-import GameStateBetter.GameStateBetter;
+import javafx.scene.control.Button;
 
 public class SimulatedAnnealingBot extends Bot{
-    public SimulatedAnnealingBot(GameStateBetter gameState, String playerType) {
-        super(gameState, playerType);}
+    public SimulatedAnnealingBot(Button[][] buttons, String playerType) {
+        super(buttons, playerType);}
 
     public int[] move() {
         // find first empty tile

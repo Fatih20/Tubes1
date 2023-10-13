@@ -3,19 +3,16 @@ package Bots;
 import GameStateBetter.GameStateBetter;
 import javafx.scene.control.Button;
 
-abstract public class Bot implements Runnable {
-    private final GameStateBetter gameState;
+abstract public class Bot {
+    private GameStateBetter gameState;
     private final String playerType;
-
-    private int[] lastMove = null;
 
     public Bot(Button[][] buttons, String playerType) {
         String[][] state = new String[8][8];
 
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                Button button = buttons[i][j];
-                state[i][j] = button.getText();
+                state[i][j] = buttons[i][j].getText();
             }
         }
 
@@ -29,41 +26,10 @@ abstract public class Bot implements Runnable {
     }
 
 
-    public int[] getLastMove() {
-        return this.lastMove;
-    }
 
     abstract public int[] move();
 
     public GameStateBetter getGameState() {
         return gameState;
-    }
-
-    @Override
-    public void run() {
-        System.out.println("Peforming move");
-        this.lastMove = this.move();
-    }
-
-    public void emergencyMove() {
-        System.out.println("Bot failed to get move after a given time. Performing emergency move");
-        // find first empty tile
-        var state = this.getGameState();
-
-        int i = 0;
-        int j = 0;
-
-        while (i < 8) {
-            if (state.getGameBoardMatrix()[i][j] == 0) {
-                this.lastMove = new int[]{i, j};
-            }
-
-            j++;
-
-            if (j == 8) {
-                j = 0;
-                i++;
-            }
-        }
     }
 }

@@ -1,3 +1,5 @@
+package GameStateBetter;
+
 public class GameStateException {
     public static class RowColumnOverFlow extends Exception {
 

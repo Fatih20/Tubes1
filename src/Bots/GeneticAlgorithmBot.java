@@ -1,10 +1,10 @@
 package Bots;
 
-import GameStateBetter.GameStateBetter;
+import javafx.scene.control.Button;
 
 public class GeneticAlgorithmBot extends Bot{
-    public GeneticAlgorithmBot(GameStateBetter gameState, String playerType) {
-        super(gameState, playerType);
+    public GeneticAlgorithmBot(Button[][] buttons, String playerType) {
+        super(buttons, playerType);
     }
 
     public int[] move() {

@@ -1,16 +1,16 @@
 package Bots;
 
-import GameStateBetter.GameStateBetter;
+import javafx.scene.control.Button;
 
 public class BotFactory {
-    public static Bot getBot(GameStateBetter gameState, String name, String playerType) {
+    public static Bot getBot(Button[][] buttons, String name, String playerType) {
         switch (name) {
             case "Minimax Bot":
-                return new MiniMaxBot(gameState, playerType);
+                return new MiniMaxBot(buttons, playerType);
             case "Simulated Annealing Bot":
-                return new SimulatedAnnealingBot(gameState, playerType);
+                return new SimulatedAnnealingBot(buttons, playerType);
             case "Genetic Algorithm Bot":
-                return new GeneticAlgorithmBot(gameState, playerType);
+                return new GeneticAlgorithmBot(buttons, playerType);
         }
 
         return null;
