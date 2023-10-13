@@ -1,5 +1,6 @@
 package Bots;
 
+import GameStateBetter.GameStateException;
 import javafx.scene.control.Button;
 
 
@@ -16,7 +17,11 @@ public class MiniMaxBot extends Bot{
 
         while (i < 8) {
             if (state.getGameBoardMatrix()[i][j] == 0) {
-                return new int[]{i, j};
+                try {
+                    this.getGameState().play(i, j, isPlayerOne());
+                    return new int[]{i, j};
+                } catch (GameStateException.IllegalMove | GameStateException.RowColumnOverFlow ignored) {
+                }
             }
 
             j++;

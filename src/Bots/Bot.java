@@ -5,7 +5,13 @@ import javafx.scene.control.Button;
 
 abstract public class Bot implements Runnable {
     private final GameStateBetter gameState;
-    private final String playerType;
+
+
+    public boolean isPlayerOne() {
+        return isPlayerOne;
+    }
+
+    private boolean isPlayerOne;
 
     private int[] lastMove;
 
@@ -19,12 +25,12 @@ abstract public class Bot implements Runnable {
         }
 
         this.gameState = new GameStateBetter(state);
-        this.playerType = playerType;
+        this.isPlayerOne = playerType.equalsIgnoreCase("x");
     }
 
     public Bot(GameStateBetter gameState, String playerType) {
         this.gameState = gameState;
-        this.playerType = playerType;
+        this.isPlayerOne = playerType.equalsIgnoreCase("x");
     }
 
 
