@@ -45,8 +45,8 @@ public class InputFrameController{
         this.numberOfRounds.setItems(numberOfRoundsDropdown);
         this.numberOfRounds.getSelectionModel().select(0);
 
-        ObservableList<String> player1Dropdown = FXCollections.observableArrayList("Human", "Bot");
-        ObservableList<String> player2Dropdown = FXCollections.observableArrayList("Bot");
+        ObservableList<String> player1Dropdown = FXCollections.observableArrayList("Human", "Minimax Bot", "Simulated Annealing Bot", "Genetic Algorithm Bot");
+        ObservableList<String> player2Dropdown = FXCollections.observableArrayList("Minimax Bot", "Simulated Annealing Bot", "Genetic Algorithm Bot");
 
         this.player1.setItems(player1Dropdown);
         this.player1.getSelectionModel().select(0);

@@ -1,3 +1,5 @@
+import Bots.Bot;
+import Bots.BotFactory;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -81,16 +83,15 @@ public class OutputFrameController {
         this.isPlayerOFirst = isBotFirst;
 
         // Start bot
-        this.botPlayerO = new Bot(this.buttons, "O");
+        this.botPlayerO = BotFactory.getBot(this.buttons, name2,"O");
         this.playerXTurn = !isBotFirst;
 
         if (this.isPlayerOFirst) {
             this.moveBotO();
         }
 
-        // Todo: modify this to determine which bot to use for testing
-        if (name1.equals("Bot")) {
-            this.botPlayerX = new Bot(this.buttons, "X");
+        if (!name1.equals("Human")) {
+            this.botPlayerX = BotFactory.getBot(this.buttons, name1, "X");
 
             while(!this.gameEnded) {
                 if (this.playerXTurn) {
