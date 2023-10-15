@@ -182,8 +182,35 @@ public class GameStateBetter {
      * Check if current move will create a hole in the board
      * */
     private boolean holeCreated(Pair<Integer,Integer> possibleMove, List<Pair<Integer,Integer>> playerPieces){
-        // TODO: check if the move will create a hole in the board
-        return false;
+        // check if (i-1, j-1) (i-1, j+1) (i+1, j-1) (i+1, j+1) are all occupied by the player
+        int i = possibleMove.getKey();
+        int j = possibleMove.getValue();
+
+        // conditioning if possibleMove is at the edge of the board
+        if (i == 0){ // top edge
+            if (j == 0){
+                return playerPieces.contains(new Pair<>(i+1,j+1));
+            } else if (j == gameBoardMatrix[0].length) {
+                return playerPieces.contains(new Pair<>(i+1,j-1));
+            } else {
+                return playerPieces.contains(new Pair<>(i+1,j-1)) || playerPieces.contains(new Pair<>(i+1,j+1));
+            }
+        } else if (i == gameBoardMatrix.length) { // bottom edge
+            if (j == 0){
+                return playerPieces.contains(new Pair<>(i-1,j+1));
+            } else if (j == gameBoardMatrix[0].length) {
+                return playerPieces.contains(new Pair<>(i-1,j-1));
+            } else {
+                return playerPieces.contains(new Pair<>(i-1,j-1)) || playerPieces.contains(new Pair<>(i-1,j+1));
+            }
+        } else if (j == 0) { // left edge
+            return playerPieces.contains(new Pair<>(i-1,j+1)) || playerPieces.contains(new Pair<>(i+1,j+1));
+        } else if (j == gameBoardMatrix[0].length) { // right edge
+            return playerPieces.contains(new Pair<>(i-1,j-1)) || playerPieces.contains(new Pair<>(i+1,j-1));
+        } else { // not at the edge of the board
+            return playerPieces.contains(new Pair<>(i-1,j-1)) || playerPieces.contains(new Pair<>(i-1,j+1)) ||
+                    playerPieces.contains(new Pair<>(i+1,j-1)) || playerPieces.contains(new Pair<>(i+1,j+1));
+        }
     }
 
     /*
