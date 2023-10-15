@@ -1,8 +1,12 @@
 package GameStateBetter;
 
 import javafx.scene.control.Button;
+import javafx.util.Pair;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @FunctionalInterface
 interface scoreIncrementor {
@@ -146,6 +150,96 @@ public class GameStateBetter {
         }
 
 
+    }
+
+    /*
+     * Check the neighboring cells of the given cell and add them to the heuristic set if they are empty
+     * */
+    private void addHeuristic(Set<Pair<Integer, Integer>> heuristic, int i, int j) {
+        if (i - 1 >= 0) { // up
+            if (gameBoardMatrix[i - 1][j] == 0) {
+                heuristic.add(new Pair<>(i - 1, j));
+            }
+        }
+        if (i + 1 < gameBoardMatrix.length) { // down
+            if (gameBoardMatrix[i + 1][j] == 0) {
+                heuristic.add(new Pair<>(i + 1, j));
+            }
+        }
+        if (j - 1 >= 0) { // left
+            if (gameBoardMatrix[i][j - 1] == 0) {
+                heuristic.add(new Pair<>(i, j - 1));
+            }
+        }
+        if (j + 1 < gameBoardMatrix[i].length) { // right
+            if (gameBoardMatrix[i][j + 1] == 0) {
+                heuristic.add(new Pair<>(i, j + 1));
+            }
+        }
+    }
+
+    /*
+     * Check if current move will create a hole in the board
+     * */
+    private boolean holeCreated(Pair<Integer,Integer> possibleMove, List<Pair<Integer,Integer>> playerPieces){
+        // TODO: check if the move will create a hole in the board
+        return false;
+    }
+
+    /*
+     * Returns a set of all possible moves for the current player in which
+     * the move is next to the opponent's piece
+     * */
+    public Set<Pair<Integer,Integer>> heuristic(boolean isPlayerOne){
+        Set<Pair<Integer,Integer>> heuristic = new HashSet<>();
+
+        // X is 1, 0 is 2
+        int enemy = isPlayerOne ? 2 : 1;
+
+        for (int i = 0; i < gameBoardMatrix.length; i++) {
+            for (int j = 0; j < gameBoardMatrix[i].length; j++) {
+                if (gameBoardMatrix[i][j] == enemy) {
+                    addHeuristic(heuristic, i, j);
+                }
+            }
+        }
+        return heuristic;
+    }
+
+
+    /*
+     * Returns a set of all possible moves for the current player in which
+     * the move is next to the opponent's piece, and it avoids any moves that
+     * cause the appearance of hole in the board
+     * */
+    public Set<Pair<Integer,Integer>> heuristicFiltered(boolean isPlayerOne){
+        List<Pair<Integer,Integer>> enemyPieces = new ArrayList<>();
+        List<Pair<Integer,Integer>> playerPieces = new ArrayList<>();
+        Set<Pair<Integer,Integer>> heuristic = new HashSet<>();
+        // X is 1, 0 is 2
+        int enemy = isPlayerOne ? 2 : 1;
+        int player = isPlayerOne ? 1 : 2;
+
+        for (int i = 0; i < gameBoardMatrix.length; i++) {
+            for (int j = 0; j < gameBoardMatrix[i].length; j++) {
+                if (gameBoardMatrix[i][j] == enemy) {
+                    // validate left right up down (nested to prevent out of bounds)
+                    addHeuristic(heuristic, i, j);
+                } else if (gameBoardMatrix[i][j] == player) {
+                    playerPieces.add(new Pair<>(i,j));
+                }
+            }
+        }
+
+        // filter the heuristic set to remove any moves that cause a hole
+        Set<Pair<Integer,Integer>> heuristicFiltered = new HashSet<>();
+        for (Pair<Integer,Integer> possibleMove : heuristic) {
+            if (!holeCreated(possibleMove, playerPieces)) {
+                heuristicFiltered.add(possibleMove);
+            }
+        }
+
+        return heuristicFiltered.isEmpty() ? heuristic : heuristicFiltered;
     }
 }
 
