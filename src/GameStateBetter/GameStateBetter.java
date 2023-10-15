@@ -213,7 +213,6 @@ public class GameStateBetter {
      * cause the appearance of hole in the board
      * */
     public Set<Pair<Integer,Integer>> heuristicFiltered(boolean isPlayerOne){
-        List<Pair<Integer,Integer>> enemyPieces = new ArrayList<>();
         List<Pair<Integer,Integer>> playerPieces = new ArrayList<>();
         Set<Pair<Integer,Integer>> heuristic = new HashSet<>();
         // X is 1, 0 is 2
