@@ -1,11 +1,15 @@
 package Bots;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 public class GeneticAlgorithmBot extends Bot {
     private int populationSize = 100;
     private int maxGenerations = 100;
+    private List<Chromosome> population;
 
     public GeneticAlgorithmBot(String playerType) {
         super(playerType);
@@ -19,7 +23,30 @@ public class GeneticAlgorithmBot extends Bot {
 
     private List<Chromosome> selectParents(){
         List<Chromosome> parents = new ArrayList<>();
-        // TODO: implement parent selection using roulette wheel selection
+
+        // make the roulette wheel
+        Map<Double, Integer> rouletteWheel= new HashMap<>();
+        double totalFitness = population.stream().mapToDouble(Chromosome::getFitness).sum();
+        double curr = 0.0D;
+        for (int i = 0; i < population.size(); i++) {
+            curr += population.get(i).getFitness() / totalFitness;
+            rouletteWheel.put(curr, i);
+        }
+
+        // spin the wheel
+        Random random = new Random();
+        for (int i = 0; i < populationSize; i++){
+            double spin = random.nextDouble();
+            double current = 0;
+            for (double fitness : rouletteWheel.keySet()){
+                current += fitness;
+                if (spin <= current){
+                    parents.add(population.get(rouletteWheel.get(fitness)));
+                    break;
+                }
+            }
+        }
+
         return parents;
     }
 
