@@ -15,9 +15,16 @@ public class GeneticAlgorithmBot extends Bot {
         super(playerType);
     }
 
-    private List<Chromosome> initializePopulation(int populationSize) {
+    private List<Chromosome> initializePopulation(int rounds) {
         List<Chromosome> population = new ArrayList<>();
         // TODO: implement population initialization
+        /*
+        * General idea is as follows:
+        * 1. Determine the length of the chromosome (number of genes) = 2 * rounds
+        * 2. Generate a random chromosome of the determined length by using heuristics
+        * 3. Repeat 2. until populationSize chromosomes are generated
+        * */
+
         return population;
     }
 
