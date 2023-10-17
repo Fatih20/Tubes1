@@ -17,9 +17,13 @@ public class HillClimbingBot extends Bot {
 
         List<Pair<Integer, Integer>> candidateCells = state.heuristicFiltered(isPlayerOne());
 
+        // Initialize maxValueCell and maxValue to be
+        // first element of candidateCells and its value
         Pair<Integer, Integer> maxValueCell = candidateCells.get(0);
         int maxValue = value(state, candidateCells.get(0).getKey(), candidateCells.get(0).getValue());
 
+        // Loop through all candidate cells and determine
+        // the best cell to move to based on their values
         for (int i = 1; i < candidateCells.size(); i++) {
             Pair<Integer, Integer> candidateCell = candidateCells.get(i);
             int value = value(state, candidateCell.getKey(), candidateCell.getValue());
@@ -37,7 +41,7 @@ public class HillClimbingBot extends Bot {
     }
 
     /**
-     * The objective function. Evaluates the value of the current game state.
+     * The objective function. Evaluates the value of the candidate move.
      *
      * @param g The current game state
      * @param i The outer index of the candidate move
