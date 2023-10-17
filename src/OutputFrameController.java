@@ -152,6 +152,18 @@ public class OutputFrameController {
 
         this.gameState = new GameStateBetter(buttons);
 
+        // Set both initial score to be 4 because of
+        // 4 X's in bottom left corner and 4 O's in top right corner
+        gameState.incrementoScore();
+        gameState.incrementoScore();
+        gameState.incrementoScore();
+        gameState.incrementoScore();
+
+        gameState.incrementxScore();
+        gameState.incrementxScore();
+        gameState.incrementxScore();
+        gameState.incrementxScore();
+
         // Construct score board with 8 rows.
         for (int i = 0; i < ROW; i++) {
             RowConstraints rowConst = new RowConstraints();
