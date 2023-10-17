@@ -13,30 +13,26 @@ public class GeneticAlgorithmBot extends Bot {
     private int populationSize = 100;
     private int maxGenerations = 100;
     private List<Chromosome> population;
+    private List<Pair<Integer,Integer>> bannedMoves;
 
     public GeneticAlgorithmBot(String playerType) {
         super(playerType);
     }
     public GeneticAlgorithmBot(GameStateBetter gameState, String playerType) {
         super(gameState, playerType);
+        for (int i = 0; i < 8; i++){
+            for (int j = 0; j < 8; j++) {
+                if (gameState.getGameBoardMatrix()[i][j] != 0){
+                    this.bannedMoves.add(new Pair<>(i, j));
+                }
+            }
+        }
     }
 
     private Chromosome makeChromosome(int rounds){
         Chromosome chromosome = new Chromosome(new ArrayList<>(), 0);
         Random random = new Random();
-        final List<Pair<Integer, Integer>> bannedMoves = List.of(
-                new Pair<>(0,6),
-                new Pair<>(1,6),
-                new Pair<>(0,7),
-                new Pair<>(1,7),
-                new Pair<>(6,0),
-                new Pair<>(6,1),
-                new Pair<>(7,0),
-                new Pair<>(7,1)
-        );
-        /*
-        * Banned coordinates = (0,6), (1,6), (0,7), (1,7), (6,0), (6,1), (7,0), (7,1)
-        * */
+
         for (int i = 0; i < 2*rounds; i++){
             int x = random.nextInt(8);
             int y = random.nextInt(8);
@@ -53,7 +49,6 @@ public class GeneticAlgorithmBot extends Bot {
 
     private List<Chromosome> initializePopulation(int rounds) {
         List<Chromosome> population = new ArrayList<>();
-        // TODO: implement population initialization
         /*
         * General idea is as follows:
         * 1. Determine the length of the chromosome (number of genes) = 2 * rounds
@@ -63,11 +58,11 @@ public class GeneticAlgorithmBot extends Bot {
         for (int i = 0; i < populationSize; i++){
             Chromosome chromosome = makeChromosome(rounds);
             // check if the chromosome is unique (by its genes)
-            while (population.contains(chromosome)){
+            while (population.stream().anyMatch(chromosome::equals)){
                 chromosome = makeChromosome(rounds);
             }
+            population.add(chromosome);
         }
-
         return population;
     }
 
