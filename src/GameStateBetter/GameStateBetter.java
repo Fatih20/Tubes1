@@ -51,7 +51,7 @@ public class GameStateBetter implements Cloneable {
     }
 
     public int getRemainingRound() {
-        return Math.floorDiv(totalTurn - currentTurn, 2);
+        return (totalTurn - currentTurn + 2 - 1) / 2;
     }
 
     public boolean isPlayerOneTurn() {
