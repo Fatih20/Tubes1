@@ -89,8 +89,8 @@ public class OutputFrameController {
 
         this.gameState.setPlayerOneTurn(!isBotFirst);
         this.gameState.setTotalTurn(Integer.parseInt(rounds) * 2);
-        startGame();
 
+        startGame();
     }
 
     /**
@@ -175,12 +175,20 @@ public class OutputFrameController {
     }
 
     private void startGame() {
-        if (!gameState.isPlayerOneTurn() && !bothBot) {
-            moveBot(botPlayerO);
-        }
-
         if (!bothBot) {
-            this.moveBotButton.setDisable(true);
+            if (gameState.isPlayerOneTurn()) {
+
+                this.moveBotButton.setDisable(true);
+
+            } else {
+
+                for (int k = 0; k < ROW; k++) {
+                    for (int l = 0; l < COL; l++) {
+                        this.buttons[k][l].setDisable(true);
+                    }
+                }
+
+            }
         }
     }
 
@@ -191,6 +199,17 @@ public class OutputFrameController {
      * @param j The column number of the button clicked.
      */
     private void selectedCoordinates(int i, int j) {
+        if (gameState.isPlayerOneTurn() && !bothBot) {
+            this.moveBotButton.setDisable(false);
+
+            // disable entire button
+            for (int k = 0; k < ROW; k++) {
+                for (int l = 0; l < COL; l++) {
+                    this.buttons[k][l].setDisable(true);
+                }
+            }
+        }
+
         this.gameState.addTurn();
         // Invalid when a button with an X or an O is clicked.
         try {
@@ -218,33 +237,11 @@ public class OutputFrameController {
         }
 
         this.gameState.alternateTurn();
-
-        if (!gameState.isPlayerOneTurn() && !bothBot) {
-            moveBot(botPlayerO);
-        }
     }
 
     private void updateScoreBoard() {
         this.playerXScoreLabel.setText(String.valueOf(this.gameState.getxScore()));
         this.playerOScoreLabel.setText(String.valueOf(this.gameState.getoScore()));
-    }
-
-    private void updateEntireButtons() {
-        for (int i = 0; i < ROW; i++) {
-            for (int j = 0; j < COL; j++) {
-                Button button = buttons[i][j];
-                button.setText("");
-                int boxContent = gameState.getGameBoardMatrix()[i][j];
-
-                if (boxContent == 2) {
-                    button.setText("X");
-                } else if (boxContent == 1) {
-                    button.setText("O");
-                } else {
-                    button.setText("");
-                }
-            }
-        }
     }
 
     /**
@@ -283,6 +280,8 @@ public class OutputFrameController {
                 this.buttons[i][j].setDisable(true);
             }
         }
+
+        this.moveBotButton.setDisable(true);
     }
 
     /**
@@ -314,9 +313,20 @@ public class OutputFrameController {
 
     @FXML
     private void nextBotMove() {
+        if (!bothBot) {
+            this.moveBotButton.setDisable(true);
+
+            // enable the faking button
+            for (int k = 0; k < ROW; k++) {
+                for (int l = 0; l < COL; l++) {
+                    this.buttons[k][l].setDisable(false);
+                }
+            }
+        }
+
         if (!gameState.isPlayerOneTurn()) {
             moveBot(botPlayerO);
-        } else {
+        } else if (bothBot) {
             moveBot(botPlayerX);
         }
     }
