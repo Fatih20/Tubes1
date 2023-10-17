@@ -12,12 +12,12 @@ interface scoreIncrementor {
 }
 
 public class GameStateBetter {
-    private int emptyBox = 64;
+    private final int emptyBox = 64;
     private int oScore = 0;
     private int xScore = 0;
     private boolean playerOneTurn;
-    private int[][] gameBoardMatrix;
-    private Button[][] buttons;
+    private final int[][] gameBoardMatrix;
+    private final Button[][] buttons;
 
     private int totalTurn = 56;
 
@@ -50,7 +50,7 @@ public class GameStateBetter {
     }
 
     public int getRemainingRound() {
-        return Math.floorDiv(totalTurn - currentTurn, 2) + 1;
+        return Math.floorDiv(totalTurn - currentTurn, 2);
     }
 
     public boolean isPlayerOneTurn() {
@@ -154,17 +154,11 @@ public class GameStateBetter {
             int neighborCell = gameBoardMatrix[rowNeighbor][columnNeighbor];
 
             if (neighborCell == opponentValue) {
-                neighborCell = playerValue;
+                gameBoardMatrix[rowNeighbor][columnNeighbor] = playerValue;
                 buttons[rowNeighbor][columnNeighbor].setText(playerText);
                 incrementPlayerScore.execute();
                 decrementOpponentScore.execute();
-
-            } /* else if (neighborCell == 0) {
-                incrementPlayerScore.execute();
-                gameBoardMatrix[rowNeighbor][columnNeighbor] = playerValue;
-                buttons[rowNeighbor][columnNeighbor].setText(playerText);
-                emptyBox--;
-            } */
+            }
         }
     }
 

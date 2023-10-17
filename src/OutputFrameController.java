@@ -47,13 +47,9 @@ public class OutputFrameController {
     private Label playerXScoreLabel;
     @FXML
     private Label playerOScoreLabel;
-
-    private int roundsLeft;
-    private boolean isPlayerOFirst;
     private Bot botPlayerO;
     private Bot botPlayerX;
     private boolean bothBot;
-    private boolean gameEnded = false;
     private GameStateBetter gameState;
 
     private static final int ROW = 8;
@@ -72,9 +68,7 @@ public class OutputFrameController {
      */
     void getInput(String name1, String name2, String rounds, boolean isBotFirst) {
         this.roundsLeftLabel.setText(rounds);
-        this.roundsLeft = Integer.parseInt(rounds);
         this.bothBot = !name1.equals("Human");
-        this.isPlayerOFirst = isBotFirst;
 
         this.botPlayerO = BotFactory.getBot(name2, "O");
         assert botPlayerO != null;
@@ -208,27 +202,13 @@ public class OutputFrameController {
             this.endOfGame();
         }
 
-//        if ((gameState.isPlayerOneTurn() && isPlayerOFirst) || !(gameState.isPlayerOneTurn() || isPlayerOFirst)) {
-//            this.roundsLeft--; // Decrement the number of rounds left after both Player X & Player O have played.
-//
-//        }
-
         if (this.gameState.isPlayerOneTurn()) {
             // Changed background color to green to indicate next player's turn.
             this.playerXBoxPane.setStyle("-fx-background-color: WHITE; -fx-border-color: #D3D3D3;");
             this.playerOBoxPane.setStyle("-fx-background-color: #90EE90; -fx-border-color: #D3D3D3;");
-
-//            if (isPlayerOFirst && this.gameState.getRemainingRound() == 0) {
-//                this.endOfGame();
-//            }
-
         } else {
             this.playerXBoxPane.setStyle("-fx-background-color: #90EE90; -fx-border-color: #D3D3D3;");
             this.playerOBoxPane.setStyle("-fx-background-color: WHITE; -fx-border-color: #D3D3D3;");
-
-//            if (!isPlayerOFirst && this.roundsLeft == 0) { // Game has terminated.
-//                this.endOfGame();       // Determine & announce the winner.
-//            }
         }
 
         this.gameState.alternateTurn();
@@ -299,8 +279,6 @@ public class OutputFrameController {
                 this.buttons[i][j].setDisable(true);
             }
         }
-
-        this.gameEnded = true;
     }
 
     /**
