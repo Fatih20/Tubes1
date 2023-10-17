@@ -235,7 +235,7 @@ public class GameStateBetter {
     }
 
     /**
-     * @param isPlayerOne is the
+     * @param isPlayerOne whether the player is X or not
      * @return a list of all possible moves for the current player in which
      * they fit the heuristic, i.e. the move is next to the opponent's piece,
      * and it avoids any moves that cause the appearance of hole in the board.
