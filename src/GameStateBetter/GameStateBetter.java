@@ -128,7 +128,7 @@ public class GameStateBetter {
             int rowNeighbor = cellNeighbor[0];
             int columnNeighbor = cellNeighbor[1];
             if (rowNeighbor >= 0 && rowNeighbor < 8 && columnNeighbor >= 0 && columnNeighbor < 8) {
-                validNeighbors.add(new int[] {cellNeighbor[0], cellNeighbor[1]});
+                validNeighbors.add(new int[]{cellNeighbor[0], cellNeighbor[1]});
             }
         }
 
@@ -181,35 +181,35 @@ public class GameStateBetter {
     /*
      * Check if current move will create a hole in the board
      * */
-    private boolean holeCreated(Pair<Integer,Integer> possibleMove, List<Pair<Integer,Integer>> playerPieces){
+    private boolean holeCreated(Pair<Integer, Integer> possibleMove, List<Pair<Integer, Integer>> playerPieces) {
         // check if (i-1, j-1) (i-1, j+1) (i+1, j-1) (i+1, j+1) are all occupied by the player
         int i = possibleMove.getKey();
         int j = possibleMove.getValue();
 
         // conditioning if possibleMove is at the edge of the board
-        if (i == 0){ // top edge
-            if (j == 0){
-                return playerPieces.contains(new Pair<>(i+1,j+1));
+        if (i == 0) { // top edge
+            if (j == 0) {
+                return playerPieces.contains(new Pair<>(i + 1, j + 1));
             } else if (j == gameBoardMatrix[0].length) {
-                return playerPieces.contains(new Pair<>(i+1,j-1));
+                return playerPieces.contains(new Pair<>(i + 1, j - 1));
             } else {
-                return playerPieces.contains(new Pair<>(i+1,j-1)) || playerPieces.contains(new Pair<>(i+1,j+1));
+                return playerPieces.contains(new Pair<>(i + 1, j - 1)) || playerPieces.contains(new Pair<>(i + 1, j + 1));
             }
         } else if (i == gameBoardMatrix.length) { // bottom edge
-            if (j == 0){
-                return playerPieces.contains(new Pair<>(i-1,j+1));
+            if (j == 0) {
+                return playerPieces.contains(new Pair<>(i - 1, j + 1));
             } else if (j == gameBoardMatrix[0].length) {
-                return playerPieces.contains(new Pair<>(i-1,j-1));
+                return playerPieces.contains(new Pair<>(i - 1, j - 1));
             } else {
-                return playerPieces.contains(new Pair<>(i-1,j-1)) || playerPieces.contains(new Pair<>(i-1,j+1));
+                return playerPieces.contains(new Pair<>(i - 1, j - 1)) || playerPieces.contains(new Pair<>(i - 1, j + 1));
             }
         } else if (j == 0) { // left edge
-            return playerPieces.contains(new Pair<>(i-1,j+1)) || playerPieces.contains(new Pair<>(i+1,j+1));
+            return playerPieces.contains(new Pair<>(i - 1, j + 1)) || playerPieces.contains(new Pair<>(i + 1, j + 1));
         } else if (j == gameBoardMatrix[0].length) { // right edge
-            return playerPieces.contains(new Pair<>(i-1,j-1)) || playerPieces.contains(new Pair<>(i+1,j-1));
+            return playerPieces.contains(new Pair<>(i - 1, j - 1)) || playerPieces.contains(new Pair<>(i + 1, j - 1));
         } else { // not at the edge of the board
-            return playerPieces.contains(new Pair<>(i-1,j-1)) || playerPieces.contains(new Pair<>(i-1,j+1)) ||
-                    playerPieces.contains(new Pair<>(i+1,j-1)) || playerPieces.contains(new Pair<>(i+1,j+1));
+            return playerPieces.contains(new Pair<>(i - 1, j - 1)) || playerPieces.contains(new Pair<>(i - 1, j + 1)) ||
+                    playerPieces.contains(new Pair<>(i + 1, j - 1)) || playerPieces.contains(new Pair<>(i + 1, j + 1));
         }
     }
 
@@ -217,8 +217,8 @@ public class GameStateBetter {
      * Returns a set of all possible moves for the current player in which
      * the move is next to the opponent's piece
      * */
-    public Set<Pair<Integer,Integer>> heuristic(boolean isPlayerOne){
-        Set<Pair<Integer,Integer>> heuristic = new HashSet<>();
+    public Set<Pair<Integer, Integer>> heuristic(boolean isPlayerOne) {
+        Set<Pair<Integer, Integer>> heuristic = new HashSet<>();
 
         // X is 1, 0 is 2
         int enemy = isPlayerOne ? 2 : 1;
@@ -239,9 +239,9 @@ public class GameStateBetter {
      * the move is next to the opponent's piece, and it avoids any moves that
      * cause the appearance of hole in the board
      * */
-    public Set<Pair<Integer,Integer>> heuristicFiltered(boolean isPlayerOne){
-        List<Pair<Integer,Integer>> playerPieces = new ArrayList<>();
-        Set<Pair<Integer,Integer>> heuristic = new HashSet<>();
+    public Set<Pair<Integer, Integer>> heuristicFiltered(boolean isPlayerOne) {
+        List<Pair<Integer, Integer>> playerPieces = new ArrayList<>();
+        Set<Pair<Integer, Integer>> heuristic = new HashSet<>();
         // X is 1, 0 is 2
         int enemy = isPlayerOne ? 2 : 1;
         int player = isPlayerOne ? 1 : 2;
@@ -252,14 +252,14 @@ public class GameStateBetter {
                     // validate left right up down (nested to prevent out of bounds)
                     addHeuristic(heuristic, i, j);
                 } else if (gameBoardMatrix[i][j] == player) {
-                    playerPieces.add(new Pair<>(i,j));
+                    playerPieces.add(new Pair<>(i, j));
                 }
             }
         }
 
         // filter the heuristic set to remove any moves that cause a hole
-        Set<Pair<Integer,Integer>> heuristicFiltered = new HashSet<>();
-        for (Pair<Integer,Integer> possibleMove : heuristic) {
+        Set<Pair<Integer, Integer>> heuristicFiltered = new HashSet<>();
+        for (Pair<Integer, Integer> possibleMove : heuristic) {
             if (!holeCreated(possibleMove, playerPieces)) {
                 heuristicFiltered.add(possibleMove);
             }
@@ -268,5 +268,3 @@ public class GameStateBetter {
         return heuristicFiltered.isEmpty() ? heuristic : heuristicFiltered;
     }
 }
-
-
