@@ -1,6 +1,7 @@
 package Bots;
 
 public class MiniMaxBot extends Bot {
+    private final int MAX_DEPTH = 5;
 
     public MiniMaxBot(String playerType) {
         super(playerType);
@@ -29,4 +30,8 @@ public class MiniMaxBot extends Bot {
 
         return new int[]{0, 0};
     }
+
+//    private minimaxPlay() {
+//
+//    }
 }

@@ -19,6 +19,10 @@ public class GameStateBetter {
     private int[][] gameBoardMatrix;
     private Button[][] buttons;
 
+    private int totalTurn = 56;
+
+    private int currentTurn = 0;
+
     public GameStateBetter(Button[][] buttonMatrix) {
         this.buttons = buttonMatrix;
         gameBoardMatrix = new int[8][8];
@@ -34,8 +38,19 @@ public class GameStateBetter {
                 }
             }
         }
-
         this.playerOneTurn = true;
+    }
+
+    public void addTurn () {
+        this.currentTurn++;
+    }
+
+    public void setTotalTurn(int totalTurn) {
+        this.totalTurn = totalTurn;
+    }
+
+    public int getRemainingRound() {
+        return Math.floorDiv(totalTurn - currentTurn, 2) + 1;
     }
 
     public boolean isPlayerOneTurn() {
