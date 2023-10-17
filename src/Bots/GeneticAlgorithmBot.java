@@ -1,5 +1,8 @@
 package Bots;
 
+import GameStateBetter.GameStateBetter;
+import javafx.util.Pair;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,6 +17,39 @@ public class GeneticAlgorithmBot extends Bot {
     public GeneticAlgorithmBot(String playerType) {
         super(playerType);
     }
+    public GeneticAlgorithmBot(GameStateBetter gameState, String playerType) {
+        super(gameState, playerType);
+    }
+
+    private Chromosome makeChromosome(int rounds){
+        Chromosome chromosome = new Chromosome(new ArrayList<>(), 0);
+        Random random = new Random();
+        final List<Pair<Integer, Integer>> bannedMoves = List.of(
+                new Pair<>(0,6),
+                new Pair<>(1,6),
+                new Pair<>(0,7),
+                new Pair<>(1,7),
+                new Pair<>(6,0),
+                new Pair<>(6,1),
+                new Pair<>(7,0),
+                new Pair<>(7,1)
+        );
+        /*
+        * Banned coordinates = (0,6), (1,6), (0,7), (1,7), (6,0), (6,1), (7,0), (7,1)
+        * */
+        for (int i = 0; i < 2*rounds; i++){
+            int x = random.nextInt(8);
+            int y = random.nextInt(8);
+            Pair<Integer, Integer> move = new Pair<>(x, y);
+            while (bannedMoves.contains(move)){
+                x = random.nextInt(8);
+                y = random.nextInt(8);
+                move = new Pair<>(x, y);
+            }
+            chromosome.getGenes().add(move);
+        }
+        return chromosome;
+    }
 
     private List<Chromosome> initializePopulation(int rounds) {
         List<Chromosome> population = new ArrayList<>();
@@ -24,6 +60,13 @@ public class GeneticAlgorithmBot extends Bot {
         * 2. Generate a random chromosome of the determined length by using heuristics
         * 3. Repeat 2. until populationSize chromosomes are generated
         * */
+        for (int i = 0; i < populationSize; i++){
+            Chromosome chromosome = makeChromosome(rounds);
+            // check if the chromosome is unique (by its genes)
+            while (population.contains(chromosome)){
+                chromosome = makeChromosome(rounds);
+            }
+        }
 
         return population;
     }
@@ -60,11 +103,19 @@ public class GeneticAlgorithmBot extends Bot {
     private List<Chromosome> crossover(List<Chromosome> parents) {
         List<Chromosome> children = new ArrayList<>();
         // TODO: implement crossover
+        /*
+        * The idea is as follows:
+        * 1. Select two concurrent parents from the list
+        * 2. Generate a random crossover point (but make sure that the crossover point it an even number)
+        * 3. Create two children by combining the genes of the parents (make sure that all genes are unique in the resulting children)
+        * 4. Repeat 1-3 until the number of children is equal to the number of parents
+        * 5. Return the list of children
+        * */
         return children;
     }
 
     private void mutate(List<Chromosome> children) {
-        // TODO: call mutate() on each child
+        children.forEach(Chromosome::mutate);
     }
 
     private void evaluateFitness(List<Chromosome> population) {
