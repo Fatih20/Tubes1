@@ -10,14 +10,10 @@ import java.util.Map;
 import java.util.Random;
 
 public class GeneticAlgorithmBot extends Bot {
-    private int populationSize = 100;
-    private int maxGenerations = 100;
+    private final int populationSize = 100;
     private List<Chromosome> population;
     private List<Pair<Integer,Integer>> bannedMoves;
 
-    public GeneticAlgorithmBot(String playerType) {
-        super(playerType);
-    }
     public GeneticAlgorithmBot(GameStateBetter gameState, String playerType) {
         super(gameState, playerType);
         this.bannedMoves = new ArrayList<>();
@@ -28,6 +24,7 @@ public class GeneticAlgorithmBot extends Bot {
                 }
             }
         }
+        this.population = initializePopulation(populationSize);
     }
 
     private Chromosome makeChromosome(int rounds){
@@ -51,6 +48,7 @@ public class GeneticAlgorithmBot extends Bot {
             }
             chromosome.getGenes().add(move);
         }
+
         return chromosome;
     }
 
@@ -103,6 +101,8 @@ public class GeneticAlgorithmBot extends Bot {
     }
 
     private List<Chromosome> crossover(List<Chromosome> parents) {
+        // TODO: fix the crossover function (most cases stuck here)
+
         List<Chromosome> children = new ArrayList<>();
         /*
         * The idea is as follows:
@@ -152,36 +152,33 @@ public class GeneticAlgorithmBot extends Bot {
         return children;
     }
 
-    /*
-    * Breeding function of the genetic algorithm (breed the next generation)
-    * */
-    private Pair<Integer, Integer> breed() {
-        // TODO: implement breeding
-        return null;
-    }
-
     public int[] move() {
-        // find first empty tile
-        var state = this.getGameState();
+        System.out.println("Genetic Algorithm Bot is thinking...");
 
+        long startTime = System.currentTimeMillis();
+        int maxGenerations = 100;
+        for (int i = 0; i < maxGenerations; i++){
+            List<Chromosome> parents = selectParents();
+            System.out.println("Parents selected");
+            List<Chromosome> children = crossover(parents);
+            System.out.println("Children created");
+            this.population = new ArrayList<>();
+            this.population.addAll(children);
 
-        int i = 0;
-        int j = 0;
+            System.out.println("Generation " + i + " is done");
+            System.out.println(this.population);
 
-        while (i < 8) {
-            if (state.getGameBoardMatrix()[i][j] == 0) {
-                return new int[]{i, j};
-
-            }
-
-            j++;
-
-            if (j == 8) {
-                j = 0;
-                i++;
+            if (System.currentTimeMillis() - startTime > 4000){
+                break;
             }
         }
+        long endTime = System.currentTimeMillis();
+        System.out.println("Time taken: " + (endTime - startTime) + "ms");
 
-        return new int[]{0, 0};
+        this.population.sort((o1, o2) -> {
+            return Integer.compare(o2.getFitness(), o1.getFitness());
+        });
+        Pair<Integer,Integer> res =  this.population.get(0).getGenes().get(0);
+        return new int[]{res.getKey(), res.getValue()};
     }
 }
