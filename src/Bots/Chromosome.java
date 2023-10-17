@@ -1,5 +1,7 @@
 package Bots;
 
+import GameStateBetter.GameStateBetter;
+import GameStateBetter.GameStateException;
 import javafx.util.Pair;
 import java.util.List;
 import java.util.Random;
@@ -8,10 +10,12 @@ public class Chromosome {
     private double mutationTreshold = 0.15;
     private List<Pair<Integer,Integer>> genes;
     private int fitness;
+    private boolean isX;
 
-    public Chromosome(List<Pair<Integer,Integer>> genes, int fitness){
+    public Chromosome(List<Pair<Integer,Integer>> genes, boolean isX){
         this.genes = genes;
-        this.fitness = fitness;
+        this.isX = isX;
+        this.fitness = 0;
     }
 
     public List<Pair<Integer,Integer>> getGenes(){
@@ -22,8 +26,29 @@ public class Chromosome {
         return this.fitness;
     }
 
-    public void setFitness(int fitness){
-        this.fitness = fitness;
+    public void setFitness(GameStateBetter gameState) {
+        /*
+        * 1. Make a copy of the game state
+        * 2. Make moves according to the genes
+        * 3. Calculate the fitness
+        * */
+        try{
+            GameStateBetter gameStateCopy = (GameStateBetter) gameState.clone();
+            for (Pair<Integer, Integer> move : this.genes) {
+                gameStateCopy.play(move.getKey(), move.getValue(), isX,true);
+            }
+            int XScore = gameStateCopy.getxScore();
+            int OScore = gameStateCopy.getoScore();
+            if (this.isX){
+                this.fitness = XScore - OScore;
+            } else {
+                this.fitness = OScore - XScore;
+            }
+        } catch (CloneNotSupportedException e){
+            e.printStackTrace();
+        } catch (GameStateException.IllegalMove | GameStateException.RowColumnOverFlow e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void mutate(){
