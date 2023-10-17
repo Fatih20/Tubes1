@@ -5,11 +5,7 @@ import javafx.scene.control.Button;
 
 abstract public class Bot implements Runnable {
     private GameStateBetter gameState;
-
-
-
     private final boolean isPlayerOne;
-
     private int[] lastMove;
 
     public Bot(String playerType) {
@@ -25,7 +21,6 @@ abstract public class Bot implements Runnable {
         this.gameState = gameState;
         this.isPlayerOne = playerType.equalsIgnoreCase("x");
     }
-
 
     public int[] getLastMove() {
         return this.lastMove;
@@ -61,7 +56,7 @@ abstract public class Bot implements Runnable {
 
         while (i < 8) {
             if (state.getGameBoardMatrix()[i][j] == 0) {
-                    this.lastMove = new int[]{i, j};
+                this.lastMove = new int[]{i, j};
             }
 
             j++;
