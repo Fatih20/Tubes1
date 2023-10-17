@@ -1,7 +1,6 @@
 package Bots;
 
 import GameStateBetter.GameStateBetter;
-import javafx.scene.control.Button;
 
 abstract public class Bot implements Runnable {
     private GameStateBetter gameState;
@@ -9,11 +8,6 @@ abstract public class Bot implements Runnable {
     private int[] lastMove;
 
     public Bot(String playerType) {
-        this.isPlayerOne = playerType.equalsIgnoreCase("x");
-    }
-
-    public Bot(Button[][] buttons, String playerType) {
-        this.gameState = new GameStateBetter(buttons);
         this.isPlayerOne = playerType.equalsIgnoreCase("x");
     }
 
