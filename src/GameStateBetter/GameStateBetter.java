@@ -11,17 +11,18 @@ interface scoreIncrementor {
     void execute();
 }
 
-public class GameStateBetter {
+public class GameStateBetter implements Cloneable {
     private final int emptyBox = 64;
     private int oScore = 0;
     private int xScore = 0;
     private boolean playerOneTurn;
-    private final int[][] gameBoardMatrix;
+    private int[][] gameBoardMatrix;
     private final Button[][] buttons;
 
     private int totalTurn = 56;
-
     private int currentTurn = 0;
+
+    private Pair<Integer, Integer> lastPlay;
 
     public GameStateBetter(Button[][] buttonMatrix) {
         this.buttons = buttonMatrix;
@@ -61,12 +62,20 @@ public class GameStateBetter {
         playerOneTurn = !playerOneTurn;
     }
 
+    public Pair<Integer, Integer> getLastPlay() {
+        return lastPlay;
+    }
+
     public void setPlayerOneTurn(boolean playerOneTurn) {
         this.playerOneTurn = playerOneTurn;
     }
 
     public int getEmptyBox() {
         return emptyBox;
+    }
+
+    public int getRemainingTurn() {
+        return totalTurn - currentTurn;
     }
 
     public int getoScore() {
@@ -111,7 +120,46 @@ public class GameStateBetter {
         }
     }
 
-    public void play(int row, int column, boolean isPlayerOne) throws GameStateException.RowColumnOverFlow, GameStateException.IllegalMove {
+    public ArrayList<GameStateBetter> generateNextStates(boolean isPlayerOne) {
+        ArrayList<GameStateBetter> nextStates = new ArrayList<>();
+
+        int playerValue = isPlayerOne ? 1 : 2;
+        int opponentValue = !(isPlayerOne) ? 1 : 2;
+
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (this.gameBoardMatrix[i][j] == 0) {
+                    try {
+                        GameStateBetter nextState = (GameStateBetter) this.clone();
+                        nextState.play(i, j, isPlayerOne, false);
+                        nextStates.add(nextState);
+                    } catch (CloneNotSupportedException | GameStateException.RowColumnOverFlow |
+                             GameStateException.IllegalMove ignored) {
+                    }
+
+                }
+            }
+        }
+        return nextStates;
+    }
+
+    public Object clone () throws CloneNotSupportedException {
+        GameStateBetter cloneState = (GameStateBetter) super.clone();
+
+        int[][] cloneGameBoardMatrix = new int[8][8];
+
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                cloneGameBoardMatrix[i][j] = this.gameBoardMatrix[i][j];
+            }
+        }
+
+        cloneState.gameBoardMatrix = cloneGameBoardMatrix;
+
+        return cloneState;
+    }
+
+    public void play(int row, int column, boolean isPlayerOne, boolean updateButtons) throws GameStateException.RowColumnOverFlow, GameStateException.IllegalMove {
         validateMove(row, column);
 
         int playerValue = isPlayerOne ? 1 : 2;
@@ -128,7 +176,11 @@ public class GameStateBetter {
         }
 
         gameBoardMatrix[row][column] = playerValue;
-        buttons[row][column].setText(playerText);
+
+        if (updateButtons) {
+            buttons[row][column].setText(playerText);
+        }
+
         incrementPlayerScore.execute();
 
         int[][] cellNeighbors = {
@@ -155,12 +207,25 @@ public class GameStateBetter {
 
             if (neighborCell == opponentValue) {
                 gameBoardMatrix[rowNeighbor][columnNeighbor] = playerValue;
+                if (updateButtons) {
                 buttons[rowNeighbor][columnNeighbor].setText(playerText);
+                }
                 incrementPlayerScore.execute();
                 decrementOpponentScore.execute();
             }
         }
+
+        this.lastPlay = new Pair<>(row, column);
     }
+
+    public void play(int row, int column, boolean isPlayerOne) throws GameStateException.RowColumnOverFlow, GameStateException.IllegalMove {
+        this.play(row, column, isPlayerOne, true);
+    }
+
+    public int getScoreDifference() {
+        return getxScore() - getoScore();
+    }
+
 
     /*
      * Check the neighboring cells of the given cell and add them to the heuristic set if they are empty
