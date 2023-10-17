@@ -175,20 +175,8 @@ public class OutputFrameController {
     }
 
     private void startGame() {
-        if (!bothBot) {
-            if (gameState.isPlayerOneTurn()) {
-
-                this.moveBotButton.setDisable(true);
-
-            } else {
-
-                for (int k = 0; k < ROW; k++) {
-                    for (int l = 0; l < COL; l++) {
-                        this.buttons[k][l].setDisable(true);
-                    }
-                }
-
-            }
+        if (!bothBot && gameState.isPlayerOneTurn()) {
+            this.moveBotButton.setDisable(true);
         }
     }
 
@@ -199,15 +187,20 @@ public class OutputFrameController {
      * @param j The column number of the button clicked.
      */
     private void selectedCoordinates(int i, int j) {
+        this.selectedCoordinates(i, j, true);
+    }
+
+    private void selectedCoordinates(int i, int j, boolean fromScreen) {
         if (gameState.isPlayerOneTurn() && !bothBot) {
             this.moveBotButton.setDisable(false);
+        }
 
-            // disable entire button
-            for (int k = 0; k < ROW; k++) {
-                for (int l = 0; l < COL; l++) {
-                    this.buttons[k][l].setDisable(true);
-                }
-            }
+        if (fromScreen && bothBot) {
+            return;
+        }
+
+        if (!gameState.isPlayerOneTurn() && !bothBot && fromScreen) {
+            return;
         }
 
         this.gameState.addTurn();
@@ -315,13 +308,6 @@ public class OutputFrameController {
     private void nextBotMove() {
         if (!bothBot) {
             this.moveBotButton.setDisable(true);
-
-            // enable the faking button
-            for (int k = 0; k < ROW; k++) {
-                for (int l = 0; l < COL; l++) {
-                    this.buttons[k][l].setDisable(false);
-                }
-            }
         }
 
         if (!gameState.isPlayerOneTurn()) {
@@ -357,6 +343,6 @@ public class OutputFrameController {
             return;
         }
 
-        this.selectedCoordinates(i, j);
+        this.selectedCoordinates(i, j, false);
     }
 }
