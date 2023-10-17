@@ -4,9 +4,7 @@ import javafx.scene.control.Button;
 import javafx.util.Pair;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @FunctionalInterface
 interface scoreIncrementor {
@@ -17,11 +15,8 @@ public class GameStateBetter {
     private int emptyBox = 64;
     private int oScore = 0;
     private int xScore = 0;
-
     private boolean playerOneTurn;
-
     private int[][] gameBoardMatrix;
-
     private Button[][] buttons;
 
     public GameStateBetter(Button[][] buttonMatrix) {
@@ -121,7 +116,13 @@ public class GameStateBetter {
         buttons[row][column].setText(playerText);
         incrementPlayerScore.execute();
 
-        int[][] cellNeighbors = {{row - 1, column}, {row + 1, column}, {row, column - 1}, {row, column + 1}};
+        int[][] cellNeighbors = {
+                {row - 1, column},
+                {row + 1, column},
+                {row, column - 1},
+                {row, column + 1}
+        };
+
         ArrayList<int[]> validNeighbors = new ArrayList<>();
 
         for (int[] cellNeighbor : cellNeighbors) {
@@ -135,27 +136,27 @@ public class GameStateBetter {
         for (int[] validNeighbor : validNeighbors) {
             int rowNeighbor = validNeighbor[0];
             int columnNeighbor = validNeighbor[1];
-            int neighborCell = gameBoardMatrix[validNeighbor[0]][validNeighbor[1]];
+            int neighborCell = gameBoardMatrix[rowNeighbor][columnNeighbor];
+
             if (neighborCell == opponentValue) {
-                gameBoardMatrix[rowNeighbor][columnNeighbor] = playerValue;
+                neighborCell = playerValue;
                 buttons[rowNeighbor][columnNeighbor].setText(playerText);
                 incrementPlayerScore.execute();
                 decrementOpponentScore.execute();
-            } else if (gameBoardMatrix[validNeighbor[0]][validNeighbor[1]] == 0) {
+
+            } /* else if (neighborCell == 0) {
                 incrementPlayerScore.execute();
                 gameBoardMatrix[rowNeighbor][columnNeighbor] = playerValue;
                 buttons[rowNeighbor][columnNeighbor].setText(playerText);
                 emptyBox--;
-            }
+            } */
         }
-
-
     }
 
     /*
      * Check the neighboring cells of the given cell and add them to the heuristic set if they are empty
      * */
-    private void addHeuristic(Set<Pair<Integer, Integer>> heuristic, int i, int j) {
+    private void addHeuristic(List<Pair<Integer, Integer>> heuristic, int i, int j) {
         if (i - 1 >= 0) { // up
             if (gameBoardMatrix[i - 1][j] == 0) {
                 heuristic.add(new Pair<>(i - 1, j));
@@ -217,8 +218,8 @@ public class GameStateBetter {
      * Returns a set of all possible moves for the current player in which
      * the move is next to the opponent's piece
      * */
-    public Set<Pair<Integer, Integer>> heuristic(boolean isPlayerOne) {
-        Set<Pair<Integer, Integer>> heuristic = new HashSet<>();
+    public List<Pair<Integer, Integer>> heuristic(boolean isPlayerOne) {
+        List<Pair<Integer, Integer>> heuristic = new ArrayList<>();
 
         // X is 1, 0 is 2
         int enemy = isPlayerOne ? 2 : 1;
@@ -233,15 +234,18 @@ public class GameStateBetter {
         return heuristic;
     }
 
-
-    /*
-     * Returns a set of all possible moves for the current player in which
-     * the move is next to the opponent's piece, and it avoids any moves that
-     * cause the appearance of hole in the board
-     * */
-    public Set<Pair<Integer, Integer>> heuristicFiltered(boolean isPlayerOne) {
+    /**
+     * @param isPlayerOne is the
+     * @return a list of all possible moves for the current player in which
+     * they fit the heuristic, i.e. the move is next to the opponent's piece,
+     * and it avoids any moves that cause the appearance of hole in the board.
+     * If the there is no suitable cell that fits the heuristic,
+     * return a list of all possible moves.
+     */
+    public List<Pair<Integer, Integer>> heuristicFiltered(boolean isPlayerOne) {
         List<Pair<Integer, Integer>> playerPieces = new ArrayList<>();
-        Set<Pair<Integer, Integer>> heuristic = new HashSet<>();
+        List<Pair<Integer, Integer>> heuristic = new ArrayList<>();
+
         // X is 1, 0 is 2
         int enemy = isPlayerOne ? 2 : 1;
         int player = isPlayerOne ? 1 : 2;
@@ -258,7 +262,7 @@ public class GameStateBetter {
         }
 
         // filter the heuristic set to remove any moves that cause a hole
-        Set<Pair<Integer, Integer>> heuristicFiltered = new HashSet<>();
+        List<Pair<Integer, Integer>> heuristicFiltered = new ArrayList<>();
         for (Pair<Integer, Integer> possibleMove : heuristic) {
             if (!holeCreated(possibleMove, playerPieces)) {
                 heuristicFiltered.add(possibleMove);
