@@ -74,12 +74,12 @@ public class OutputFrameController {
         this.roundsLeftLabel.setText(rounds);
         this.bothBot = !name1.equals("Human");
 
-        this.botPlayerO = BotFactory.getBot(name2, "O");
+        this.botPlayerO = BotFactory.getBot(name2, "O", gameState);
         assert botPlayerO != null;
         botPlayerO.setGameState(gameState);
 
         if (bothBot) {
-            this.botPlayerX = BotFactory.getBot(name1, "X");
+            this.botPlayerX = BotFactory.getBot(name1, "X", gameState);
             assert this.botPlayerX != null;
             this.botPlayerX.setGameState(gameState);
         }
