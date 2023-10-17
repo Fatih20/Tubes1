@@ -20,7 +20,7 @@ public class MiniMaxBot extends Bot {
 
         Pair<Integer, Integer> nextMove = minimaxPlay(this.getGameState(), remainingDepth, this.isPlayerOne(), Integer.MIN_VALUE, Integer.MAX_VALUE).getKey();
 
-        System.out.print("Pruned : ");
+        System.out.print("Pruning occurrence : ");
         System.out.println(this.pruned);
         this.pruned = 0;
 
