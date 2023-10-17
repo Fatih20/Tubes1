@@ -20,6 +20,7 @@ public class GeneticAlgorithmBot extends Bot {
     }
     public GeneticAlgorithmBot(GameStateBetter gameState, String playerType) {
         super(gameState, playerType);
+        this.bannedMoves = new ArrayList<>();
         for (int i = 0; i < 8; i++){
             for (int j = 0; j < 8; j++) {
                 if (gameState.getGameBoardMatrix()[i][j] != 0){
@@ -30,7 +31,7 @@ public class GeneticAlgorithmBot extends Bot {
     }
 
     private Chromosome makeChromosome(int rounds){
-        Chromosome chromosome = new Chromosome(new ArrayList<>(), 0);
+        Chromosome chromosome = new Chromosome(new ArrayList<>(), this.isPlayerOne(), this.getGameState());
         Random random = new Random();
 
         for (int i = 0; i < 2*rounds; i++){
@@ -110,7 +111,7 @@ public class GeneticAlgorithmBot extends Bot {
     }
 
     private void mutate(List<Chromosome> children) {
-        children.forEach(Chromosome::mutate);
+        children.forEach(child -> child.mutate(this.bannedMoves));
     }
 
     private void evaluateFitness(List<Chromosome> population) {
