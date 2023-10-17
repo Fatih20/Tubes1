@@ -34,6 +34,12 @@ public class GeneticAlgorithmBot extends Bot {
         Chromosome chromosome = new Chromosome(new ArrayList<>(), this.isPlayerOne(), this.getGameState());
         Random random = new Random();
 
+        // TODO: refactor to use the heuristic (also change Chromosome.java)
+        /*
+        * Idea is as follows:
+        * 1. make the chromosome constructor have a parameter for the game state and length of rounds
+        * */
+
         for (int i = 0; i < 2*rounds; i++){
             int x = random.nextInt(8);
             int y = random.nextInt(8);
@@ -98,24 +104,60 @@ public class GeneticAlgorithmBot extends Bot {
 
     private List<Chromosome> crossover(List<Chromosome> parents) {
         List<Chromosome> children = new ArrayList<>();
-        // TODO: implement crossover
         /*
         * The idea is as follows:
-        * 1. Select two concurrent parents from the list
+        * 1. Select two concurrent parents from the list (i and i+1)
         * 2. Generate a random crossover point (but make sure that the crossover point it an even number)
         * 3. Create two children by combining the genes of the parents (make sure that all genes are unique in the resulting children)
         * 4. Repeat 1-3 until the number of children is equal to the number of parents
         * 5. Return the list of children
+        * 6. Mutate the children
+        *
+        * NB: to pertain uniqueness of the genes for the children, the random crossover point will be tried 5 times before giving up and then the parents are just copied
         * */
+        for (int i = 0; i < populationSize; i+=2) {
+            Chromosome parent1 = parents.get(i);
+            Chromosome parent2 = parents.get((i + 1) % populationSize);
+            int tries = 0;
+            boolean success = false;
+            Random random = new Random();
+            Chromosome child1 = null;
+            Chromosome child2 = null;
+            while (tries < 5 && !success) {
+                int crossoverPoint = random.nextInt(parent1.getGenes().size());
+                while (crossoverPoint % 2 != 0) {
+                    crossoverPoint = random.nextInt(parent1.getGenes().size());
+                }
+                List<Pair<Integer, Integer>> genes1 = new ArrayList<>(parent1.getGenes().subList(0, crossoverPoint));
+                List<Pair<Integer, Integer>> genes2 = new ArrayList<>(parent2.getGenes().subList(0, crossoverPoint));
+                genes1.addAll(parent2.getGenes().subList(crossoverPoint, parent2.getGenes().size()));
+                genes2.addAll(parent1.getGenes().subList(crossoverPoint, parent1.getGenes().size()));
+                if (genes1.stream().distinct().count() == genes1.size() && genes2.stream().distinct().count() == genes2.size()) {
+                    success = true;
+                    child1 = new Chromosome(genes1, this.isPlayerOne(), this.getGameState());
+                    child2 = new Chromosome(genes2, this.isPlayerOne(), this.getGameState());
+                } else {
+                    tries++;
+                }
+            }
+            if (!success) {
+                child1 = new Chromosome(parent1.getGenes(), this.isPlayerOne(), this.getGameState());
+                child2 = new Chromosome(parent2.getGenes(), this.isPlayerOne(), this.getGameState());
+            }
+            child1.mutate(bannedMoves);
+            child2.mutate(bannedMoves);
+            children.add(child1);
+            children.add(child2);
+        }
         return children;
     }
 
-    private void mutate(List<Chromosome> children) {
-        children.forEach(child -> child.mutate(this.bannedMoves));
-    }
-
-    private void evaluateFitness(List<Chromosome> population) {
-        // TODO: evaluate fitness for each chromosome in population
+    /*
+    * Breeding function of the genetic algorithm (breed the next generation)
+    * */
+    private Pair<Integer, Integer> breed() {
+        // TODO: implement breeding
+        return null;
     }
 
     public int[] move() {
