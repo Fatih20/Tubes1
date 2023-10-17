@@ -120,6 +120,11 @@ public class GameStateBetter implements Cloneable {
         }
     }
 
+    /**
+     * Generate all possible states that could result from this state
+     * @param isPlayerOne
+     * @return
+     */
     public ArrayList<GameStateBetter> generateNextStates(boolean isPlayerOne) {
         ArrayList<GameStateBetter> nextStates = new ArrayList<>();
 
@@ -222,6 +227,10 @@ public class GameStateBetter implements Cloneable {
         this.play(row, column, isPlayerOne, true);
     }
 
+    /**
+     *
+     * @return the difference in score between player one and player two
+     */
     public int getScoreDifference() {
         return getxScore() - getoScore();
     }

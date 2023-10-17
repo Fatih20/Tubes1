@@ -27,6 +27,15 @@ public class MiniMaxBot extends Bot {
         return new int[]{nextMove.getKey(), nextMove.getValue()};
     }
 
+    /**
+     *
+     * @param node the state to start from
+     * @param remainingDepth how many more recursion has to be checked
+     * @param isPlayerOne is this player x
+     * @param alpha alpha value of minimax algorithm
+     * @param beta beta value of minimax algorithm
+     * @return Last executed move and the value that results from that move
+     */
     private Pair<Pair<Integer, Integer>, Integer> minimaxPlay(GameStateBetter node, int remainingDepth, boolean isPlayerOne, int alpha, int beta) {
         if (remainingDepth == 0) {
             return new Pair<>(node.getLastPlay(), node.getScoreDifference());
