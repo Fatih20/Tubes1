@@ -31,10 +31,8 @@ import java.util.concurrent.TimeUnit;
 public class OutputFrameController {
     @FXML
     private GridPane gameBoard;
-
     @FXML
     private GridPane scoreBoard;
-
     @FXML
     private Label roundsLeftLabel;
     @FXML
@@ -50,19 +48,13 @@ public class OutputFrameController {
     @FXML
     private Label playerOScoreLabel;
 
-
     private int roundsLeft;
     private boolean isPlayerOFirst;
     private Bot botPlayerO;
-
     private Bot botPlayerX;
-
     private boolean bothBot;
-
     private boolean gameEnded = false;
-
     private GameStateBetter gameState;
-
 
     private static final int ROW = 8;
     private static final int COL = 8;
@@ -102,14 +94,12 @@ public class OutputFrameController {
 
     }
 
-
     /**
      * Construct the 8x8 game board by creating a total of 64 buttons in a 2-dimensional array, and construct the 8x2 score board for scorekeeping
      * and then initialize turn and score.
      */
     @FXML
     private void initialize() {
-
         // Construct game board with 8 rows.
         for (int i = 0; i < ROW; i++) {
             RowConstraints rowConst = new RowConstraints();
@@ -183,7 +173,6 @@ public class OutputFrameController {
         this.playerOBoxPane.setStyle("-fx-background-color: white; -fx-border-color: #D3D3D3;");
         this.playerXScoreLabel.setText(String.valueOf(this.gameState.getxScore()));
         this.playerOScoreLabel.setText(String.valueOf(this.gameState.getoScore()));
-
     }
 
     private void startGame() {
@@ -194,7 +183,6 @@ public class OutputFrameController {
         }
 
     }
-
 
     /**
      * Process the coordinates of the button that the user selected on the game board.
@@ -244,8 +232,6 @@ public class OutputFrameController {
         }
     }
 
-
-
     private void updateScoreBoard() {
         this.playerXScoreLabel.setText(String.valueOf(this.gameState.getxScore()));
         this.playerOScoreLabel.setText(String.valueOf(this.gameState.getoScore()));
@@ -268,7 +254,6 @@ public class OutputFrameController {
             }
         }
     }
-
 
     /**
      * Determine and announce the winner of the game.
@@ -310,7 +295,6 @@ public class OutputFrameController {
         this.gameEnded = true;
     }
 
-
     /**
      * Close OutputFrame controlled by OutputFrameController if end game button is clicked.
      */
@@ -318,7 +302,6 @@ public class OutputFrameController {
     private void endGame() {
         System.exit(0);
     }
-
 
     /**
      * Reopen InputFrame controlled by InputFrameController if play new game button is clicked.
@@ -365,6 +348,5 @@ public class OutputFrameController {
         }
 
         this.selectedCoordinates(i, j);
-
     }
 }
