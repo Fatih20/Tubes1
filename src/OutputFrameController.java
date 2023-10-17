@@ -47,6 +47,10 @@ public class OutputFrameController {
     private Label playerXScoreLabel;
     @FXML
     private Label playerOScoreLabel;
+
+    @FXML
+    private Button moveBotButton;
+
     private Bot botPlayerO;
     private Bot botPlayerX;
     private boolean bothBot;
@@ -171,12 +175,13 @@ public class OutputFrameController {
     }
 
     private void startGame() {
-        if (!gameState.isPlayerOneTurn()) {
+        if (!gameState.isPlayerOneTurn() && !bothBot) {
             moveBot(botPlayerO);
-        } else if (bothBot) {
-            moveBot(botPlayerX);
         }
 
+        if (!bothBot) {
+            this.moveBotButton.setDisable(true);
+        }
     }
 
     /**
@@ -200,6 +205,7 @@ public class OutputFrameController {
 
         if (this.gameState.getRemainingRound() == 0) {
             this.endOfGame();
+            return;
         }
 
         if (this.gameState.isPlayerOneTurn()) {
@@ -213,10 +219,8 @@ public class OutputFrameController {
 
         this.gameState.alternateTurn();
 
-        if (!gameState.isPlayerOneTurn()) {
+        if (!gameState.isPlayerOneTurn() && !bothBot) {
             moveBot(botPlayerO);
-        } else if (bothBot) {
-            moveBot(botPlayerX);
         }
     }
 
@@ -308,6 +312,15 @@ public class OutputFrameController {
         primaryStage.show();
     }
 
+    @FXML
+    private void nextBotMove() {
+        if (!gameState.isPlayerOneTurn()) {
+            moveBot(botPlayerO);
+        } else {
+            moveBot(botPlayerX);
+        }
+    }
+
     private void moveBot(Bot bot) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
 
@@ -317,6 +330,7 @@ public class OutputFrameController {
             future.get(5, TimeUnit.SECONDS);
         } catch (Exception e) {
             System.out.println("Wait timeout");
+            future.cancel(true);
             bot.emergencyMove();
         }
 
