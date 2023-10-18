@@ -13,7 +13,7 @@ public class HillClimbingBot extends Bot {
         super(gameState, playerType);
     }
 
-    public int[] move() {
+    protected int[] move() {
         GameStateBetter state = this.getGameState();
 
         List<Pair<Integer, Integer>> candidateCells = state.heuristicFiltered(isPlayerOne());

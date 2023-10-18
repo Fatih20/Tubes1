@@ -15,7 +15,7 @@ public class MiniMaxBot extends Bot {
     }
 
 
-    public int[] move() {
+    protected int[] move() {
         int remainingDepth = Math.min(this.getGameState().getRemainingTurn(), this.MAX_DEPTH);
 
         Pair<Integer, Integer> nextMove = minimaxPlay(this.getGameState(), remainingDepth, this.isPlayerOne(), Integer.MIN_VALUE, Integer.MAX_VALUE).getKey();

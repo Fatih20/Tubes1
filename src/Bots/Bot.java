@@ -17,10 +17,13 @@ abstract public class Bot implements Runnable {
     }
 
     public int[] getLastMove() {
-        return this.lastMove;
+        var lastMove = this.lastMove;
+        this.lastMove = null;
+
+        return lastMove;
     }
 
-    abstract public int[] move();
+    abstract protected int[] move();
 
     public GameStateBetter getGameState() {
         return gameState;
