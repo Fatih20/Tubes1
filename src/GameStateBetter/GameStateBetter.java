@@ -120,8 +120,9 @@ public class GameStateBetter implements Cloneable {
 
     /**
      * Generate all possible states that could result from this state
+     *
      * @param isPlayerOne is the turn made as player one?
-     * @return all of the nextStates
+     * @return all the nextStates
      */
     public ArrayList<GameStateBetter> generateNextStates(boolean isPlayerOne) {
         ArrayList<GameStateBetter> nextStates = new ArrayList<>(Collections.nCopies(this.emptyBox, null));
@@ -131,16 +132,15 @@ public class GameStateBetter implements Cloneable {
             for (int i = 0; i < 8; i++) {
                 for (int j = 0; j < 8; j++) {
                     if (this.gameBoardMatrix[i][j] == 0) {
-                            GameStateBetter nextState = (GameStateBetter) this.clone();
-                            nextState.play(i, j, isPlayerOne, false);
-                            nextStates.set(k, nextState);
-                            k++;
+                        GameStateBetter nextState = (GameStateBetter) this.clone();
+                        nextState.play(i, j, isPlayerOne, false);
+                        nextStates.set(k, nextState);
+                        k++;
                     }
                 }
             }
         } catch (CloneNotSupportedException | GameStateException.RowColumnOverFlow |
-                             GameStateException.IllegalMove ignored)
-        {
+                 GameStateException.IllegalMove ignored) {
         }
         return nextStates;
     }
@@ -215,7 +215,6 @@ public class GameStateBetter implements Cloneable {
     }
 
     /**
-     *
      * @return the difference in score between player one and player two
      */
     public int getScoreDifference() {
@@ -223,10 +222,15 @@ public class GameStateBetter implements Cloneable {
     }
 
 
-    /*
-     * Check the neighboring cells of the given cell and add them to the heuristic set if they are empty
-     * */
-    private void addHeuristic(List<Pair<Integer, Integer>> heuristic, int i, int j) {
+    /**
+     * Add all empty neighbor cells of the corresponding cell (i, j) to heuristic.
+     * Does nothing if there is no empty neighbor cell.
+     *
+     * @param heuristic
+     * @param i         The outer index of the game board matrix
+     * @param j         The inner index of the game board matrix
+     */
+    private void addEmptyNeighborCells(List<Pair<Integer, Integer>> heuristic, int i, int j) {
         if (i - 1 >= 0) { // up
             if (gameBoardMatrix[i - 1][j] == 0) {
                 heuristic.add(new Pair<>(i - 1, j));
@@ -284,10 +288,13 @@ public class GameStateBetter implements Cloneable {
         }
     }
 
-    /*
-     * Returns a set of all possible moves for the current player in which
-     * the move is next to the opponent's piece
-     * */
+    /**
+     * @param isPlayerOne whether the player is X or not
+     * @return a list of all possible moves for the current player in which
+     * they fit the first heuristic, i.e. the move is next to the opponent's piece.
+     * If the there is no suitable move that fits the heuristic,
+     * return a list of all possible moves, i.e. all empty boxes.
+     */
     public List<Pair<Integer, Integer>> heuristic(boolean isPlayerOne) {
         List<Pair<Integer, Integer>> heuristic = new ArrayList<>();
         List<Pair<Integer, Integer>> possibleMoves = new ArrayList<>();
@@ -298,7 +305,7 @@ public class GameStateBetter implements Cloneable {
         for (int i = 0; i < gameBoardMatrix.length; i++) {
             for (int j = 0; j < gameBoardMatrix[i].length; j++) {
                 if (gameBoardMatrix[i][j] == enemy) {
-                    addHeuristic(heuristic, i, j);
+                    addEmptyNeighborCells(heuristic, i, j);
                 }
                 if (gameBoardMatrix[i][j] == 0) {
                     possibleMoves.add(new Pair<>(i, j));
@@ -315,10 +322,10 @@ public class GameStateBetter implements Cloneable {
     /**
      * @param isPlayerOne whether the player is X or not
      * @return a list of all possible moves for the current player in which
-     * they fit the heuristic, i.e. the move is next to the opponent's piece,
+     * they fit both heuristic, i.e. the move is next to the opponent's piece,
      * and it avoids any moves that cause the appearance of hole in the board.
-     * If the there is no suitable cell that fits the heuristic,
-     * return a list of all possible moves.
+     * If the there is no suitable move that fits the heuristic,
+     * return a list of all possible moves, i.e. all empty boxes.
      */
     public List<Pair<Integer, Integer>> heuristicFiltered(boolean isPlayerOne) {
         List<Pair<Integer, Integer>> playerPieces = new ArrayList<>();
@@ -331,8 +338,7 @@ public class GameStateBetter implements Cloneable {
         for (int i = 0; i < gameBoardMatrix.length; i++) {
             for (int j = 0; j < gameBoardMatrix[i].length; j++) {
                 if (gameBoardMatrix[i][j] == enemy) {
-                    // validate left right up down (nested to prevent out of bounds)
-                    addHeuristic(heuristic, i, j);
+                    addEmptyNeighborCells(heuristic, i, j);
                 } else if (gameBoardMatrix[i][j] == player) {
                     playerPieces.add(new Pair<>(i, j));
                 }
