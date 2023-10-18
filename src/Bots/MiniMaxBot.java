@@ -15,7 +15,7 @@ public class MiniMaxBot extends Bot {
     protected int[] move() {
         int remainingDepth = Math.min(this.getGameState().getRemainingTurn(), this.MAX_DEPTH);
 
-        return minimaxPlay(this.getGameState(), remainingDepth, this.isPlayerOne(), Integer.MIN_VALUE, Integer.MAX_VALUE).getKey();
+        return minimaxPlay(this.getGameState(), remainingDepth, this.isPlayerOne(), Integer.MIN_VALUE, Integer.MAX_VALUE);
     }
 
     /**
@@ -26,9 +26,9 @@ public class MiniMaxBot extends Bot {
      * @param beta           beta value of minimax algorithm
      * @return Last executed move and the value that results from that move
      */
-    private Pair<int[], Integer> minimaxPlay(GameStateBetter node, int remainingDepth, boolean isPlayerOne, int alpha, int beta) {
+    private int[] minimaxPlay(GameStateBetter node, int remainingDepth, boolean isPlayerOne, int alpha, int beta) {
         if (remainingDepth == 0) {
-            return new Pair<>(node.getLastPlay(), node.getScoreDifference());
+            return new int[]{node.getLastPlay()[0], node.getLastPlay()[1], node.getScoreDifference()};
         }
 
         int[][] nextMoves = node.getEmptyBoxes();
@@ -40,8 +40,8 @@ public class MiniMaxBot extends Bot {
                 GameStateBetter newState = (GameStateBetter) node.clone();
                 newState.play(nextMove[0], nextMove[1], isPlayerOne, false);
 
-                Pair<int[], Integer> minimaxReturn = minimaxPlay(newState, remainingDepth - 1, !isPlayerOne, alpha, beta);
-                int value = minimaxReturn.getValue();
+                int[] minimaxReturn = minimaxPlay(newState, remainingDepth - 1, !isPlayerOne, alpha, beta);
+                int value = minimaxReturn[2];
 
                 if (isPlayerOne) {
                     if (value > bestValue) {
@@ -65,6 +65,6 @@ public class MiniMaxBot extends Bot {
 
         }
 
-        return new Pair<>(bestMove, bestValue);
+        return new int[]{bestMove[0], bestMove[1], bestValue};
     }
 }
