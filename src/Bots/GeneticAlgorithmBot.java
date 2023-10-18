@@ -112,8 +112,7 @@ public class GeneticAlgorithmBot extends Bot {
             Chromosome child1 = null;
             Chromosome child2 = null;
             while (tries < 3 && !success) {
-                int crossoverPoint = random.nextInt(parent1.getGenes().size() / 2);
-                crossoverPoint *= 2;
+                int crossoverPoint = random.nextInt(parent1.getGenes().size());
                 List<Pair<Integer, Integer>> genes1 = new ArrayList<>(parent1.getGenes().subList(0, crossoverPoint));
                 List<Pair<Integer, Integer>> genes2 = new ArrayList<>(parent2.getGenes().subList(0, crossoverPoint));
                 genes1.addAll(parent2.getGenes().subList(crossoverPoint, parent2.getGenes().size()));
