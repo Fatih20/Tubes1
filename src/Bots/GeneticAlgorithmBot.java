@@ -24,7 +24,7 @@ public class GeneticAlgorithmBot extends Bot {
                 }
             }
         }
-        this.population = initializePopulation(populationSize);
+        this.population = initializePopulation(getGameState().getRemainingRound());
     }
 
     private Chromosome makeChromosome(int rounds){
@@ -41,7 +41,7 @@ public class GeneticAlgorithmBot extends Bot {
             int x = random.nextInt(8);
             int y = random.nextInt(8);
             Pair<Integer, Integer> move = new Pair<>(x, y);
-            while (bannedMoves.contains(move)){
+            while (bannedMoves.contains(move) || chromosome.getGenes().contains(move)){
                 x = random.nextInt(8);
                 y = random.nextInt(8);
                 move = new Pair<>(x, y);
@@ -49,6 +49,7 @@ public class GeneticAlgorithmBot extends Bot {
             chromosome.getGenes().add(move);
         }
 
+        chromosome.setFitness();
         return chromosome;
     }
 
@@ -113,7 +114,7 @@ public class GeneticAlgorithmBot extends Bot {
         * 5. Return the list of children
         * 6. Mutate the children
         *
-        * NB: to pertain uniqueness of the genes for the children, the random crossover point will be tried 5 times before giving up and then the parents are just copied
+        * NB: to pertain uniqueness of the genes for the children, the random crossover point will be tried 3 times before giving up and then the parents are just copied
         * */
         for (int i = 0; i < populationSize; i+=2) {
             Chromosome parent1 = parents.get(i);
@@ -123,11 +124,9 @@ public class GeneticAlgorithmBot extends Bot {
             Random random = new Random();
             Chromosome child1 = null;
             Chromosome child2 = null;
-            while (tries < 5 && !success) {
-                int crossoverPoint = random.nextInt(parent1.getGenes().size());
-                while (crossoverPoint % 2 != 0) {
-                    crossoverPoint = random.nextInt(parent1.getGenes().size());
-                }
+            while (tries < 3 && !success) {
+                int crossoverPoint = random.nextInt(parent1.getGenes().size()/2);
+                crossoverPoint *= 2;
                 List<Pair<Integer, Integer>> genes1 = new ArrayList<>(parent1.getGenes().subList(0, crossoverPoint));
                 List<Pair<Integer, Integer>> genes2 = new ArrayList<>(parent2.getGenes().subList(0, crossoverPoint));
                 genes1.addAll(parent2.getGenes().subList(crossoverPoint, parent2.getGenes().size()));
@@ -153,27 +152,20 @@ public class GeneticAlgorithmBot extends Bot {
     }
 
     public int[] move() {
-        System.out.println("Genetic Algorithm Bot is thinking...");
 
         long startTime = System.currentTimeMillis();
         int maxGenerations = 100;
         for (int i = 0; i < maxGenerations; i++){
             List<Chromosome> parents = selectParents();
-            System.out.println("Parents selected");
             List<Chromosome> children = crossover(parents);
-            System.out.println("Children created");
             this.population = new ArrayList<>();
             this.population.addAll(children);
-
-            System.out.println("Generation " + i + " is done");
-            System.out.println(this.population);
 
             if (System.currentTimeMillis() - startTime > 4000){
                 break;
             }
         }
         long endTime = System.currentTimeMillis();
-        System.out.println("Time taken: " + (endTime - startTime) + "ms");
 
         this.population.sort((o1, o2) -> {
             return Integer.compare(o2.getFitness(), o1.getFitness());
