@@ -2,14 +2,14 @@ package Bots;
 
 import GameStateBetter.GameStateBetter;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 abstract public class Bot implements Runnable {
-    private GameStateBetter gameState;
+    private final GameStateBetter gameState;
     private final boolean isPlayerOne;
     private int[] lastMove;
-
-    public Bot(String playerType) {
-        this.isPlayerOne = playerType.equalsIgnoreCase("x");
-    }
 
     public Bot(GameStateBetter gameState, String playerType) {
         this.gameState = gameState;
@@ -17,18 +17,18 @@ abstract public class Bot implements Runnable {
     }
 
     public int[] getLastMove() {
-        return this.lastMove;
+        var lastMove = this.lastMove;
+        this.lastMove = null;
+
+        return lastMove;
     }
 
-    abstract public int[] move();
+    abstract protected int[] move();
 
     public GameStateBetter getGameState() {
         return gameState;
     }
 
-    public void setGameState(GameStateBetter gameState) {
-        this.gameState = gameState;
-    }
 
     @Override
     public void run() {
@@ -45,12 +45,14 @@ abstract public class Bot implements Runnable {
         // find first empty tile
         var state = this.getGameState();
 
+        List<int[]> candidate = new ArrayList<>();
+
         int i = 0;
         int j = 0;
 
         while (i < 8) {
             if (state.getGameBoardMatrix()[i][j] == 0) {
-                this.lastMove = new int[]{i, j};
+                candidate.add(new int[]{i, j});
             }
 
             j++;
@@ -60,5 +62,10 @@ abstract public class Bot implements Runnable {
                 i++;
             }
         }
+
+        // select random
+        int rnd = new Random().nextInt(candidate.size());
+
+        this.lastMove = candidate.get(rnd);
     }
 }

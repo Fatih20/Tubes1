@@ -8,11 +8,12 @@ import java.util.List;
 
 public class HillClimbingBot extends Bot {
 
-    public HillClimbingBot(String playerType) {
-        super(playerType);
+
+    public HillClimbingBot(GameStateBetter gameState, String playerType) {
+        super(gameState, playerType);
     }
 
-    public int[] move() {
+    protected int[] move() {
         GameStateBetter state = this.getGameState();
 
         List<Pair<Integer, Integer>> candidateCells = state.heuristicFiltered(isPlayerOne());
