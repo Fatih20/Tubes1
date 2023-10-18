@@ -87,10 +87,19 @@ public class OutputFrameController {
         this.playerXName.setText(name1);
         this.playerOName.setText(name2);
 
-        this.gameState.setPlayerOneTurn(!isBotFirst);
+        this.gameState.setPlayerOneFirst(!isBotFirst);
         this.gameState.setTotalTurn(Integer.parseInt(rounds) * 2);
 
-        startGame();
+        // Initialize turn and score for the game.
+        if (this.gameState.isPlayerOneTurn()) {
+            // Changed background color to green to indicate next player's turn.
+            this.playerXBoxPane.setStyle("-fx-background-color: #90EE90; -fx-border-color: #D3D3D3;");
+            this.playerOBoxPane.setStyle("-fx-background-color: WHITE; -fx-border-color: #D3D3D3;");
+        } else {
+            this.playerXBoxPane.setStyle("-fx-background-color: WHITE; -fx-border-color: #D3D3D3;");
+            this.playerOBoxPane.setStyle("-fx-background-color: #90EE90; -fx-border-color: #D3D3D3;");
+        }
+            startGame();
     }
 
     /**
@@ -167,9 +176,7 @@ public class OutputFrameController {
             this.scoreBoard.getColumnConstraints().add(colConst);
         }
 
-        // Initialize turn and score for the game.
-        this.playerXBoxPane.setStyle("-fx-background-color: #90EE90; -fx-border-color: #D3D3D3;");
-        this.playerOBoxPane.setStyle("-fx-background-color: white; -fx-border-color: #D3D3D3;");
+
         this.playerXScoreLabel.setText(String.valueOf(this.gameState.getxScore()));
         this.playerOScoreLabel.setText(String.valueOf(this.gameState.getoScore()));
     }
@@ -203,7 +210,6 @@ public class OutputFrameController {
             return;
         }
 
-        this.gameState.addTurn();
         // Invalid when a button with an X or an O is clicked.
         try {
             this.gameState.play(i, j, this.gameState.isPlayerOneTurn());
@@ -229,7 +235,7 @@ public class OutputFrameController {
             this.playerOBoxPane.setStyle("-fx-background-color: WHITE; -fx-border-color: #D3D3D3;");
         }
 
-        this.gameState.alternateTurn();
+        this.gameState.addTurn();
     }
 
     private void updateScoreBoard() {
