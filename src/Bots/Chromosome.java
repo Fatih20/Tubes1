@@ -3,6 +3,8 @@ package Bots;
 import GameStateBetter.GameStateBetter;
 import GameStateBetter.GameStateException;
 import javafx.util.Pair;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -11,6 +13,72 @@ public class Chromosome {
     private int fitness;
     private final boolean isX;
     private final GameStateBetter gameState;
+    private static final List<Pair<Integer,Integer>> allMoves = List.<Pair<Integer, Integer>>of(
+            new Pair<>(0, 0),
+            new Pair<>(0, 1),
+            new Pair<>(0, 2),
+            new Pair<>(0, 3),
+            new Pair<>(0, 4),
+            new Pair<>(0, 5),
+            new Pair<>(0, 6),
+            new Pair<>(0, 7),
+            new Pair<>(1, 0),
+            new Pair<>(1, 1),
+            new Pair<>(1, 2),
+            new Pair<>(1, 3),
+            new Pair<>(1, 4),
+            new Pair<>(1, 5),
+            new Pair<>(1, 6),
+            new Pair<>(1, 7),
+            new Pair<>(2, 0),
+            new Pair<>(2, 1),
+            new Pair<>(2, 2),
+            new Pair<>(2, 3),
+            new Pair<>(2, 4),
+            new Pair<>(2, 5),
+            new Pair<>(2, 6),
+            new Pair<>(2, 7),
+            new Pair<>(3, 0),
+            new Pair<>(3, 1),
+            new Pair<>(3, 2),
+            new Pair<>(3, 3),
+            new Pair<>(3, 4),
+            new Pair<>(3, 5),
+            new Pair<>(3, 6),
+            new Pair<>(3, 7),
+            new Pair<>(4, 0),
+            new Pair<>(4, 1),
+            new Pair<>(4, 2),
+            new Pair<>(4, 3),
+            new Pair<>(4, 4),
+            new Pair<>(4, 5),
+            new Pair<>(4, 6),
+            new Pair<>(4, 7),
+            new Pair<>(5, 0),
+            new Pair<>(5, 1),
+            new Pair<>(5, 2),
+            new Pair<>(5, 3),
+            new Pair<>(5, 4),
+            new Pair<>(5, 5),
+            new Pair<>(5, 6),
+            new Pair<>(5, 7),
+            new Pair<>(6, 0),
+            new Pair<>(6, 1),
+            new Pair<>(6, 2),
+            new Pair<>(6, 3),
+            new Pair<>(6, 4),
+            new Pair<>(6, 5),
+            new Pair<>(6, 6),
+            new Pair<>(6, 7),
+            new Pair<>(7, 0),
+            new Pair<>(7, 1),
+            new Pair<>(7, 2),
+            new Pair<>(7, 3),
+            new Pair<>(7, 4),
+            new Pair<>(7, 5),
+            new Pair<>(7, 6),
+            new Pair<>(7, 7)
+    );
 
     public Chromosome(List<Pair<Integer,Integer>> genes, boolean isX, GameStateBetter gameState){
         this.genes = genes;
@@ -66,16 +134,14 @@ public class Chromosome {
         if (mutationChance < mutationTreshold){ // mutation happens
             int randomMutationPoint = random.nextInt(this.genes.size());
             Pair<Integer, Integer> move = this.genes.get(randomMutationPoint);
-            int x = random.nextInt(8);
-            int y = random.nextInt(8);
-            Pair<Integer, Integer> newMove = new Pair<>(x, y);
-            while (bannedMoves.contains(newMove) || this.genes.contains(newMove)){
-                x = random.nextInt(8);
-                y = random.nextInt(8);
-                newMove = new Pair<>(x, y);
-            }
+            List<Pair<Integer, Integer>> allowedMoves = new ArrayList<>(allMoves);
+            allowedMoves.removeAll(bannedMoves);
+            allowedMoves.removeAll(this.genes);
+            Pair<Integer, Integer> newMove = allowedMoves.get(random.nextInt(allowedMoves.size()));
             this.genes.set(randomMutationPoint, newMove);
             this.setFitness();
+            System.out.println("Mutation happened");
+            System.out.println("Fitness: " + this.fitness);
         }
     }
 
