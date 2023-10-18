@@ -54,18 +54,30 @@ public class GeneticAlgorithmBot extends Bot {
 
         // make the roulette wheel
         Map<Double, Integer> rouletteWheel = new HashMap<>();
+
+        // find the minimum fitness, if it is negative, then do normalization
         double minFitness = population.stream().mapToDouble(Chromosome::getFitness).min().getAsDouble();
+
+        double totalFitness = population.stream().mapToDouble(Chromosome::getFitness).sum();
         if (minFitness < 0) {
-            minFitness = -minFitness;
+            double temp = -minFitness;
+            temp++;
+            totalFitness += temp * population.size();
         }
-        double totalFitness = (population.stream().mapToDouble(Chromosome::getFitness).sum()) + (minFitness * population.size());
+
         if (totalFitness == 0) {
             totalFitness = population.size();
             minFitness = 1;
         }
-        double curr = 0.0D;
+
+        double curr = 0;
         for (int i = 0; i < population.size(); i++) {
-            curr += (population.get(i).getFitness() + minFitness) / totalFitness;
+            double numerator = population.get(i).getFitness();
+            if (minFitness < 0) {
+                numerator -= minFitness;
+                numerator++;
+            }
+            curr += numerator / totalFitness;
             rouletteWheel.put(curr, i);
         }
 
