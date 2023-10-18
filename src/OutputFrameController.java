@@ -198,6 +198,7 @@ public class OutputFrameController {
     }
 
     private void selectedCoordinates(int i, int j, boolean fromScreen) {
+
         if (gameState.isPlayerOneTurn() && !bothBot) {
             this.moveBotButton.setDisable(false);
         }
@@ -221,11 +222,6 @@ public class OutputFrameController {
 
         this.roundsLeftLabel.setText(String.valueOf(this.gameState.getRemainingRound()));
 
-        if (this.gameState.getRemainingRound() == 0) {
-            this.endOfGame();
-            return;
-        }
-
         if (this.gameState.isPlayerOneTurn()) {
             // Changed background color to green to indicate next player's turn.
             this.playerXBoxPane.setStyle("-fx-background-color: WHITE; -fx-border-color: #D3D3D3;");
@@ -236,6 +232,11 @@ public class OutputFrameController {
         }
 
         this.gameState.addTurn();
+
+        int remainingRound = this.gameState.getRemainingRound();
+        if (remainingRound == 0) {
+            this.endOfGame();
+        }
     }
 
     private void updateScoreBoard() {
