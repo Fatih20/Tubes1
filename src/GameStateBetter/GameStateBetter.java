@@ -15,7 +15,7 @@ public class GameStateBetter implements Cloneable {
     private final int emptyBox = 64;
     private int oScore = 0;
     private int xScore = 0;
-    private boolean playerOneTurn;
+    private boolean playerOneFirst;
     private int[][] gameBoardMatrix;
     private final Button[][] buttons;
 
@@ -39,7 +39,6 @@ public class GameStateBetter implements Cloneable {
                 }
             }
         }
-        this.playerOneTurn = true;
     }
 
     public void addTurn () {
@@ -50,24 +49,24 @@ public class GameStateBetter implements Cloneable {
         this.totalTurn = totalTurn;
     }
 
+    public boolean isPlayerOneFirst() {
+        return playerOneFirst;
+    }
+
+    public void setPlayerOneFirst(boolean playerOneFirst) {
+        this.playerOneFirst = playerOneFirst;
+    }
+
     public int getRemainingRound() {
         return (totalTurn - currentTurn + 2 - 1) / 2;
     }
 
     public boolean isPlayerOneTurn() {
-        return playerOneTurn;
-    }
-
-    public void alternateTurn() {
-        playerOneTurn = !playerOneTurn;
+        return (playerOneFirst && (currentTurn % 2 == 0)) || (!playerOneFirst && !(currentTurn % 2 == 0));
     }
 
     public Pair<Integer, Integer> getLastPlay() {
         return lastPlay;
-    }
-
-    public void setPlayerOneTurn(boolean playerOneTurn) {
-        this.playerOneTurn = playerOneTurn;
     }
 
     public int getEmptyBox() {
@@ -122,8 +121,8 @@ public class GameStateBetter implements Cloneable {
 
     /**
      * Generate all possible states that could result from this state
-     * @param isPlayerOne
-     * @return
+     * @param isPlayerOne is the turn made as player one?
+     * @return all of the nextStates
      */
     public ArrayList<GameStateBetter> generateNextStates(boolean isPlayerOne) {
         ArrayList<GameStateBetter> nextStates = new ArrayList<>();
@@ -154,9 +153,7 @@ public class GameStateBetter implements Cloneable {
         int[][] cloneGameBoardMatrix = new int[8][8];
 
         for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                cloneGameBoardMatrix[i][j] = this.gameBoardMatrix[i][j];
-            }
+            System.arraycopy(this.gameBoardMatrix[i], 0, cloneGameBoardMatrix[i], 0, 8);
         }
 
         cloneState.gameBoardMatrix = cloneGameBoardMatrix;
