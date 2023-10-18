@@ -104,10 +104,14 @@ public class Chromosome {
         try {
             GameStateBetter gameStateCopy = (GameStateBetter) this.gameState.clone();
             boolean turn = this.isX;
+            System.out.println("Genes: " + this.genes);
             for (Pair<Integer, Integer> move : this.genes) {
+                System.out.println("Move: " + move);
                 gameStateCopy.play(move.getKey(), move.getValue(), turn, false);
                 turn = !turn;
+                System.out.println("Move played");
             }
+
             int XScore = gameStateCopy.getxScore();
             int OScore = gameStateCopy.getoScore();
             if (this.isX) {
@@ -159,12 +163,13 @@ public class Chromosome {
         return true;
     }
 
-    public static Chromosome make(int turns, boolean isX, GameStateBetter gameState) {
+    public static Chromosome make(int turns, boolean isX, GameStateBetter gameState, List<Pair<Integer, Integer>> bannedMoves) {
         Chromosome chromosome = new Chromosome(new ArrayList<>(), isX, gameState);
         Random random = new Random();
 
         for (int i = 0; i < turns; i++) {
             List<Pair<Integer, Integer>> allowedMoves = new ArrayList<>(allMoves);
+            allowedMoves.removeAll(bannedMoves);
             allowedMoves.removeAll(chromosome.getGenes());
             Pair<Integer, Integer> move = allowedMoves.get(random.nextInt(allowedMoves.size()));
             while (chromosome.getGenes().contains(move)) {
@@ -172,7 +177,9 @@ public class Chromosome {
             }
             chromosome.getGenes().add(move);
         }
+        System.out.println("Chromosome made, checking fitness");
         chromosome.setFitness();
+        System.out.println("Fitness checked: " + chromosome.getFitness());
         return chromosome;
     }
 }

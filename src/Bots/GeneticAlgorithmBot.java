@@ -33,12 +33,16 @@ public class GeneticAlgorithmBot extends Bot {
         System.out.println("Poopulation Initialization started");
         for (int i = 0; i < populationSize; i++) {
             System.out.println("i = " + i);
-            Chromosome chromosome = Chromosome.make(turns, this.isPlayerOne(), this.getGameState());
+            Chromosome chromosome = Chromosome.make(turns, this.isPlayerOne(), this.getGameState(), bannedMoves);
+            System.out.println("Chromosome generated");
+            System.out.println(chromosome);
             // check if the chromosome is unique (by its genes)
             while (population.stream().anyMatch(chromosome::equals)) {
-                chromosome = Chromosome.make(turns, this.isPlayerOne(), this.getGameState());
+                chromosome = Chromosome.make(turns, this.isPlayerOne(), this.getGameState(), bannedMoves);
             }
             population.add(chromosome);
+            System.out.println("Chromosome added to population");
+            System.out.println(population);
         }
     }
 
@@ -137,6 +141,11 @@ public class GeneticAlgorithmBot extends Bot {
     }
 
     protected int[] move() {
+        Pair<Integer, Integer> lastMoved = this.getGameState().getLastPlay();
+        if (lastMoved != null) {
+            this.bannedMoves.add(lastMoved);
+        }
+
         System.out.println("Initializing population");
         initializePopulation(getGameState().getRemainingTurn());
         System.out.println("Initial population");
@@ -162,6 +171,9 @@ public class GeneticAlgorithmBot extends Bot {
         });
         Pair<Integer, Integer> res = this.population.get(0).getGenes().get(0);
         System.out.println("Best move: " + res);
+
+        bannedMoves.add(res);
+
         return new int[]{res.getKey(), res.getValue()};
     }
 }
