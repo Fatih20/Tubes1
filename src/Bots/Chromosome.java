@@ -141,9 +141,6 @@ public class Chromosome {
             allowedMoves.removeAll(this.genes);
             Pair<Integer, Integer> newMove = allowedMoves.get(random.nextInt(allowedMoves.size()));
             this.genes.set(randomMutationPoint, newMove);
-            this.setFitness();
-            System.out.println("Mutation happened");
-            System.out.println("Fitness: " + this.fitness);
         }
     }
 

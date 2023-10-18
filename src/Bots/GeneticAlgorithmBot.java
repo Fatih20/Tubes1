@@ -11,9 +11,9 @@ import java.util.Map;
 import java.util.Random;
 
 public class GeneticAlgorithmBot extends Bot {
-    private final int populationSize = 5;
+    private final int populationSize = 30;
     private List<Chromosome> population;
-    private List<Pair<Integer,Integer>> bannedMoves;
+    private final List<Pair<Integer,Integer>> bannedMoves;
 
     public GeneticAlgorithmBot(GameStateBetter gameState, String playerType) {
         super(gameState, playerType);
@@ -25,10 +25,9 @@ public class GeneticAlgorithmBot extends Bot {
                 }
             }
         }
-        this.population = initializePopulation(getGameState().getRemainingRound());
     }
 
-    private Chromosome makeChromosome(int rounds){
+    private Chromosome makeChromosome(int turns){
         Chromosome chromosome = new Chromosome(new ArrayList<>(), this.isPlayerOne(), this.getGameState());
         Random random = new Random();
 
@@ -37,7 +36,7 @@ public class GeneticAlgorithmBot extends Bot {
         * 1. make the chromosome constructor have a parameter for the game state and length of rounds
         * */
 
-        for (int i = 0; i < 2*rounds; i++){
+        for (int i = 0; i < turns; i++){
             int x = random.nextInt(8);
             int y = random.nextInt(8);
             Pair<Integer, Integer> move = new Pair<>(x, y);
@@ -53,8 +52,8 @@ public class GeneticAlgorithmBot extends Bot {
         return chromosome;
     }
 
-    private List<Chromosome> initializePopulation(int rounds) {
-        List<Chromosome> population = new ArrayList<>();
+    private void initializePopulation(int rounds) {
+        population = new ArrayList<>();
         /*
         * General idea is as follows:
         * 1. Determine the length of the chromosome (number of genes) = 2 * rounds
@@ -69,20 +68,28 @@ public class GeneticAlgorithmBot extends Bot {
             }
             population.add(chromosome);
         }
-        return population;
     }
 
     private List<Chromosome> selectParents(){
         List<Chromosome> parents = new ArrayList<>();
 
+        System.out.println("select parents");
+        System.out.println(this.population);
+
         // make the roulette wheel
         Map<Double, Integer> rouletteWheel= new HashMap<>();
-        double totalFitness = population.stream().mapToDouble(Chromosome::getFitness).sum();
+        double minFitness = population.stream().mapToDouble(Chromosome::getFitness).min().getAsDouble();
+        if (minFitness < 0){
+            minFitness = -minFitness;
+        }
+        double totalFitness = population.stream().mapToDouble(Chromosome::getFitness).sum() + minFitness * population.size();
         double curr = 0.0D;
         for (int i = 0; i < population.size(); i++) {
-            curr += population.get(i).getFitness() / totalFitness;
+            curr += (population.get(i).getFitness() + minFitness) / totalFitness;
             rouletteWheel.put(curr, i);
         }
+
+        System.out.println(rouletteWheel);
 
         // spin the wheel
         Random random = new Random();
@@ -102,8 +109,6 @@ public class GeneticAlgorithmBot extends Bot {
     }
 
     private List<Chromosome> crossover(List<Chromosome> parents) {
-        // TODO: fix the crossover function (most cases stuck here)
-
         List<Chromosome> children = new ArrayList<>();
         /*
         * The idea is as follows:
@@ -129,13 +134,10 @@ public class GeneticAlgorithmBot extends Bot {
                 System.out.println("tries = " + tries);
                 int crossoverPoint = random.nextInt(parent1.getGenes().size()/2);
                 crossoverPoint *= 2;
-                System.out.println("crossoverPoint = " + crossoverPoint);
                 List<Pair<Integer, Integer>> genes1 = new ArrayList<>(parent1.getGenes().subList(0, crossoverPoint));
                 List<Pair<Integer, Integer>> genes2 = new ArrayList<>(parent2.getGenes().subList(0, crossoverPoint));
                 genes1.addAll(parent2.getGenes().subList(crossoverPoint, parent2.getGenes().size()));
                 genes2.addAll(parent1.getGenes().subList(crossoverPoint, parent1.getGenes().size()));
-                System.out.println("genes1 = " + genes1);
-                System.out.println("genes2 = " + genes2);
                 if (genes1.stream().distinct().count() == genes1.size() && genes2.stream().distinct().count() == genes2.size()) {
                     success = true;
                     child1 = new Chromosome(genes1, this.isPlayerOne(), this.getGameState());
@@ -150,6 +152,8 @@ public class GeneticAlgorithmBot extends Bot {
             }
             child1.mutate(bannedMoves);
             child2.mutate(bannedMoves);
+            child1.setFitness();
+            child2.setFitness();
             children.add(child1);
             children.add(child2);
         }
@@ -157,7 +161,9 @@ public class GeneticAlgorithmBot extends Bot {
     }
 
     public int[] move() {
-        int maxGenerations = 3;
+        initializePopulation(getGameState().getRemainingTurn());
+
+        int maxGenerations = 15;
         for (int i = 0; i < maxGenerations; i++){
             System.out.println("---------------------");
             System.out.println(population);
@@ -174,11 +180,7 @@ public class GeneticAlgorithmBot extends Bot {
             return Integer.compare(o2.getFitness(), o1.getFitness());
         });
         Pair<Integer,Integer> res =  this.population.get(0).getGenes().get(0);
-        try {
-            this.getGameState().play(res.getKey(), res.getValue(), this.isPlayerOne(), false);
-        } catch (GameStateException.IllegalMove | GameStateException.RowColumnOverFlow e) {
-            throw new RuntimeException(e);
-        }
+        System.out.println("Best move: " + res);
         return new int[]{res.getKey(), res.getValue()};
     }
 }
