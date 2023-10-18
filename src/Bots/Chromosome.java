@@ -103,8 +103,10 @@ public class Chromosome {
         * */
         try{
             GameStateBetter gameStateCopy = (GameStateBetter) this.gameState.clone();
+            boolean turn = this.isX;
             for (Pair<Integer, Integer> move : this.genes) {
-                gameStateCopy.play(move.getKey(), move.getValue(), isX,false);
+                gameStateCopy.play(move.getKey(), move.getValue(), turn,false);
+                turn = !turn;
             }
             int XScore = gameStateCopy.getxScore();
             int OScore = gameStateCopy.getoScore();
