@@ -41,7 +41,7 @@ public class GameStateBetter implements Cloneable {
         }
     }
 
-    public void addTurn () {
+    public void addTurn() {
         this.currentTurn++;
     }
 
@@ -121,6 +121,7 @@ public class GameStateBetter implements Cloneable {
 
     /**
      * Generate all possible states that could result from this state
+     *
      * @param isPlayerOne is the turn made as player one?
      * @return all of the nextStates
      */
@@ -147,7 +148,7 @@ public class GameStateBetter implements Cloneable {
         return nextStates;
     }
 
-    public Object clone () throws CloneNotSupportedException {
+    public Object clone() throws CloneNotSupportedException {
         GameStateBetter cloneState = (GameStateBetter) super.clone();
 
         int[][] cloneGameBoardMatrix = new int[8][8];
@@ -210,7 +211,7 @@ public class GameStateBetter implements Cloneable {
             if (neighborCell == opponentValue) {
                 gameBoardMatrix[rowNeighbor][columnNeighbor] = playerValue;
                 if (updateButtons) {
-                buttons[rowNeighbor][columnNeighbor].setText(playerText);
+                    buttons[rowNeighbor][columnNeighbor].setText(playerText);
                 }
                 incrementPlayerScore.execute();
                 decrementOpponentScore.execute();
@@ -225,7 +226,6 @@ public class GameStateBetter implements Cloneable {
     }
 
     /**
-     *
      * @return the difference in score between player one and player two
      */
     public int getScoreDifference() {
@@ -300,6 +300,7 @@ public class GameStateBetter implements Cloneable {
      * */
     public List<Pair<Integer, Integer>> heuristic(boolean isPlayerOne) {
         List<Pair<Integer, Integer>> heuristic = new ArrayList<>();
+        List<Pair<Integer, Integer>> possibleMoves = new ArrayList<>();
 
         // X is 1, 0 is 2
         int enemy = isPlayerOne ? 2 : 1;
@@ -309,8 +310,15 @@ public class GameStateBetter implements Cloneable {
                 if (gameBoardMatrix[i][j] == enemy) {
                     addHeuristic(heuristic, i, j);
                 }
+                if (gameBoardMatrix[i][j] == 0) {
+                    possibleMoves.add(new Pair<>(i, j));
+                }
             }
         }
+        if (heuristic.isEmpty()) {
+            return possibleMoves;
+        }
+
         return heuristic;
     }
 
