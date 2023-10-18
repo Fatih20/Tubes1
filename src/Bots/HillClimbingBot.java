@@ -16,7 +16,7 @@ public class HillClimbingBot extends Bot {
     protected int[] move() {
         GameStateBetter state = this.getGameState();
 
-        List<Pair<Integer, Integer>> candidateCells = state.heuristicFiltered(isPlayerOne());
+        List<Pair<Integer, Integer>> candidateCells = state.heuristic(isPlayerOne());
 
         // Initialize maxValueCell and maxValue to be
         // first element of candidateCells and its value
