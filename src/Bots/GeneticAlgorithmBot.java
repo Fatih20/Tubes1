@@ -1,88 +1,64 @@
 package Bots;
 
 import GameStateBetter.GameStateBetter;
-import GameStateBetter.GameStateException;
 import javafx.util.Pair;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 public class GeneticAlgorithmBot extends Bot {
-    private final int populationSize = 30;
+    private final int populationSize = 10;
     private List<Chromosome> population;
-    private final List<Pair<Integer,Integer>> bannedMoves;
+    private final List<Pair<Integer, Integer>> bannedMoves;
 
     public GeneticAlgorithmBot(GameStateBetter gameState, String playerType) {
         super(gameState, playerType);
         this.bannedMoves = new ArrayList<>();
-        for (int i = 0; i < 8; i++){
+        for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                if (gameState.getGameBoardMatrix()[i][j] != 0){
+                if (gameState.getGameBoardMatrix()[i][j] != 0) {
                     this.bannedMoves.add(new Pair<>(i, j));
                 }
             }
         }
     }
 
-    private Chromosome makeChromosome(int turns){
-        Chromosome chromosome = new Chromosome(new ArrayList<>(), this.isPlayerOne(), this.getGameState());
-        Random random = new Random();
-
-        /*
-        * Idea is as follows:
-        * 1. make the chromosome constructor have a parameter for the game state and length of rounds
-        * */
-
-        for (int i = 0; i < turns; i++){
-            int x = random.nextInt(8);
-            int y = random.nextInt(8);
-            Pair<Integer, Integer> move = new Pair<>(x, y);
-            while (bannedMoves.contains(move) || chromosome.getGenes().contains(move)){
-                x = random.nextInt(8);
-                y = random.nextInt(8);
-                move = new Pair<>(x, y);
-            }
-            chromosome.getGenes().add(move);
-        }
-
-        chromosome.setFitness();
-        return chromosome;
-    }
-
-    private void initializePopulation(int rounds) {
+    private void initializePopulation(int turns) {
         population = new ArrayList<>();
         /*
-        * General idea is as follows:
-        * 1. Determine the length of the chromosome (number of genes) = 2 * rounds
-        * 2. Generate a random chromosome of the determined length by using heuristics
-        * 3. Repeat 2. until populationSize chromosomes are generated
-        * */
-        for (int i = 0; i < populationSize; i++){
-            Chromosome chromosome = makeChromosome(rounds);
+         * General idea is as follows:
+         * 1. Determine the length of the chromosome (number of genes) = 2 * rounds
+         * 2. Generate a random chromosome of the determined length by using heuristics
+         * 3. Repeat 2. until populationSize chromosomes are generated
+         * */
+        System.out.println("Poopulation Initialization started");
+        for (int i = 0; i < populationSize; i++) {
+            System.out.println("i = " + i);
+            Chromosome chromosome = Chromosome.make(turns, this.isPlayerOne(), this.getGameState());
             // check if the chromosome is unique (by its genes)
-            while (population.stream().anyMatch(chromosome::equals)){
-                chromosome = makeChromosome(rounds);
+            while (population.stream().anyMatch(chromosome::equals)) {
+                chromosome = Chromosome.make(turns, this.isPlayerOne(), this.getGameState());
             }
             population.add(chromosome);
         }
     }
 
-    private List<Chromosome> selectParents(){
+    private List<Chromosome> selectParents() {
         List<Chromosome> parents = new ArrayList<>();
 
         System.out.println("select parents");
         System.out.println(this.population);
 
         // make the roulette wheel
-        Map<Double, Integer> rouletteWheel= new HashMap<>();
+        Map<Double, Integer> rouletteWheel = new HashMap<>();
         double minFitness = population.stream().mapToDouble(Chromosome::getFitness).min().getAsDouble();
-        if (minFitness < 0){
+        if (minFitness < 0) {
             minFitness = -minFitness;
         }
-        double totalFitness = population.stream().mapToDouble(Chromosome::getFitness).sum() + minFitness * population.size();
+        double totalFitness = (population.stream().mapToDouble(Chromosome::getFitness).sum()) + (minFitness * population.size());
+        if (totalFitness == 0) {
+            totalFitness = population.size();
+            minFitness = 1;
+        }
         double curr = 0.0D;
         for (int i = 0; i < population.size(); i++) {
             curr += (population.get(i).getFitness() + minFitness) / totalFitness;
@@ -93,12 +69,12 @@ public class GeneticAlgorithmBot extends Bot {
 
         // spin the wheel
         Random random = new Random();
-        for (int i = 0; i < populationSize; i++){
+        for (int i = 0; i < populationSize; i++) {
             double spin = random.nextDouble();
             double current = 0;
-            for (double fitness : rouletteWheel.keySet()){
+            for (double fitness : rouletteWheel.keySet()) {
                 current += fitness;
-                if (spin <= current){
+                if (spin <= current) {
                     parents.add(population.get(rouletteWheel.get(fitness)));
                     break;
                 }
@@ -111,17 +87,17 @@ public class GeneticAlgorithmBot extends Bot {
     private List<Chromosome> crossover(List<Chromosome> parents) {
         List<Chromosome> children = new ArrayList<>();
         /*
-        * The idea is as follows:
-        * 1. Select two concurrent parents from the list (i and i+1)
-        * 2. Generate a random crossover point (but make sure that the crossover point it an even number)
-        * 3. Create two children by combining the genes of the parents (make sure that all genes are unique in the resulting children)
-        * 4. Repeat 1-3 until the number of children is equal to the number of parents
-        * 5. Return the list of children
-        * 6. Mutate the children
-        *
-        * NB: to pertain uniqueness of the genes for the children, the random crossover point will be tried 3 times before giving up and then the parents are just copied
-        * */
-        for (int i = 0; i < populationSize; i+=2) {
+         * The idea is as follows:
+         * 1. Select two concurrent parents from the list (i and i+1)
+         * 2. Generate a random crossover point (but make sure that the crossover point it an even number)
+         * 3. Create two children by combining the genes of the parents (make sure that all genes are unique in the resulting children)
+         * 4. Repeat 1-3 until the number of children is equal to the number of parents
+         * 5. Return the list of children
+         * 6. Mutate the children
+         *
+         * NB: to pertain uniqueness of the genes for the children, the random crossover point will be tried 3 times before giving up and then the parents are just copied
+         * */
+        for (int i = 0; i < populationSize; i += 2) {
             System.out.println("i = " + i);
             Chromosome parent1 = parents.get(i);
             Chromosome parent2 = parents.get((i + 1) % populationSize);
@@ -132,7 +108,7 @@ public class GeneticAlgorithmBot extends Bot {
             Chromosome child2 = null;
             while (tries < 3 && !success) {
                 System.out.println("tries = " + tries);
-                int crossoverPoint = random.nextInt(parent1.getGenes().size()/2);
+                int crossoverPoint = random.nextInt(parent1.getGenes().size() / 2);
                 crossoverPoint *= 2;
                 List<Pair<Integer, Integer>> genes1 = new ArrayList<>(parent1.getGenes().subList(0, crossoverPoint));
                 List<Pair<Integer, Integer>> genes2 = new ArrayList<>(parent2.getGenes().subList(0, crossoverPoint));
@@ -160,12 +136,17 @@ public class GeneticAlgorithmBot extends Bot {
         return children;
     }
 
-    public int[] move() {
+    protected int[] move() {
+        System.out.println("Initializing population");
         initializePopulation(getGameState().getRemainingTurn());
+        System.out.println("Initial population");
+        System.out.println(population);
+        System.out.println("Starting move");
 
-        int maxGenerations = 15;
-        for (int i = 0; i < maxGenerations; i++){
+        int maxGenerations = 5;
+        for (int i = 0; i < maxGenerations; i++) {
             System.out.println("---------------------");
+            System.out.println("Generation " + i);
             System.out.println(population);
             List<Chromosome> parents = selectParents();
             System.out.println(parents);
@@ -179,7 +160,7 @@ public class GeneticAlgorithmBot extends Bot {
         this.population.sort((o1, o2) -> {
             return Integer.compare(o2.getFitness(), o1.getFitness());
         });
-        Pair<Integer,Integer> res =  this.population.get(0).getGenes().get(0);
+        Pair<Integer, Integer> res = this.population.get(0).getGenes().get(0);
         System.out.println("Best move: " + res);
         return new int[]{res.getKey(), res.getValue()};
     }

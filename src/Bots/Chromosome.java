@@ -158,4 +158,21 @@ public class Chromosome {
         }
         return true;
     }
+
+    public static Chromosome make(int turns, boolean isX, GameStateBetter gameState){
+        Chromosome chromosome = new Chromosome(new ArrayList<>, isX, gameState);
+        Random random = new Random();
+
+        for (int i = 0 ; i < turns; i++){
+            List<Pair<Integer, Integer>> allowedMoves = new ArrayList<>(allMoves);
+            allowedMoves.removeAll(chromosome.getGenes());
+            Pair<Integer, Integer> move = allowedMoves.get(random.nextInt(allowedMoves.size()));
+            while(chromosome.getGenes().contains(move)){
+                move = allowedMoves.get(random.nextInt(allowedMoves.size()));
+            }
+            chromosome.getGenes().add(move);
+        }
+        chromosome.setFitness();
+        return chromosome;
+    }
 }
