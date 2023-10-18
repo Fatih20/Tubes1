@@ -1,6 +1,7 @@
 package Bots;
 
 import GameStateBetter.GameStateBetter;
+import GameStateBetter.GameStateException;
 import javafx.util.Pair;
 
 import java.util.ArrayList;
@@ -10,7 +11,7 @@ import java.util.Map;
 import java.util.Random;
 
 public class GeneticAlgorithmBot extends Bot {
-    private final int populationSize = 100;
+    private final int populationSize = 5;
     private List<Chromosome> population;
     private List<Pair<Integer,Integer>> bannedMoves;
 
@@ -31,7 +32,6 @@ public class GeneticAlgorithmBot extends Bot {
         Chromosome chromosome = new Chromosome(new ArrayList<>(), this.isPlayerOne(), this.getGameState());
         Random random = new Random();
 
-        // TODO: refactor to use the heuristic (also change Chromosome.java)
         /*
         * Idea is as follows:
         * 1. make the chromosome constructor have a parameter for the game state and length of rounds
@@ -117,6 +117,7 @@ public class GeneticAlgorithmBot extends Bot {
         * NB: to pertain uniqueness of the genes for the children, the random crossover point will be tried 3 times before giving up and then the parents are just copied
         * */
         for (int i = 0; i < populationSize; i+=2) {
+            System.out.println("i = " + i);
             Chromosome parent1 = parents.get(i);
             Chromosome parent2 = parents.get((i + 1) % populationSize);
             int tries = 0;
@@ -125,12 +126,16 @@ public class GeneticAlgorithmBot extends Bot {
             Chromosome child1 = null;
             Chromosome child2 = null;
             while (tries < 3 && !success) {
+                System.out.println("tries = " + tries);
                 int crossoverPoint = random.nextInt(parent1.getGenes().size()/2);
                 crossoverPoint *= 2;
+                System.out.println("crossoverPoint = " + crossoverPoint);
                 List<Pair<Integer, Integer>> genes1 = new ArrayList<>(parent1.getGenes().subList(0, crossoverPoint));
                 List<Pair<Integer, Integer>> genes2 = new ArrayList<>(parent2.getGenes().subList(0, crossoverPoint));
                 genes1.addAll(parent2.getGenes().subList(crossoverPoint, parent2.getGenes().size()));
                 genes2.addAll(parent1.getGenes().subList(crossoverPoint, parent1.getGenes().size()));
+                System.out.println("genes1 = " + genes1);
+                System.out.println("genes2 = " + genes2);
                 if (genes1.stream().distinct().count() == genes1.size() && genes2.stream().distinct().count() == genes2.size()) {
                     success = true;
                     child1 = new Chromosome(genes1, this.isPlayerOne(), this.getGameState());
@@ -152,25 +157,28 @@ public class GeneticAlgorithmBot extends Bot {
     }
 
     public int[] move() {
-
-        long startTime = System.currentTimeMillis();
-        int maxGenerations = 100;
+        int maxGenerations = 3;
         for (int i = 0; i < maxGenerations; i++){
+            System.out.println("---------------------");
+            System.out.println(population);
             List<Chromosome> parents = selectParents();
+            System.out.println(parents);
             List<Chromosome> children = crossover(parents);
+            System.out.println(children);
             this.population = new ArrayList<>();
             this.population.addAll(children);
-
-            if (System.currentTimeMillis() - startTime > 4000){
-                break;
-            }
+            population.forEach(Chromosome::setFitness);
         }
-        long endTime = System.currentTimeMillis();
 
         this.population.sort((o1, o2) -> {
             return Integer.compare(o2.getFitness(), o1.getFitness());
         });
         Pair<Integer,Integer> res =  this.population.get(0).getGenes().get(0);
+        try {
+            this.getGameState().play(res.getKey(), res.getValue(), this.isPlayerOne(), false);
+        } catch (GameStateException.IllegalMove | GameStateException.RowColumnOverFlow e) {
+            throw new RuntimeException(e);
+        }
         return new int[]{res.getKey(), res.getValue()};
     }
 }
