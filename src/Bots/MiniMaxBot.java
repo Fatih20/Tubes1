@@ -1,12 +1,11 @@
 package Bots;
 
 import GameStateBetter.GameStateBetter;
+import GameStateBetter.GameStateException;
 import javafx.util.Pair;
 
-import java.util.ArrayList;
-
 public class MiniMaxBot extends Bot {
-    private final int MAX_DEPTH = 5;
+    private final int MAX_DEPTH = 6;
 
     public MiniMaxBot(GameStateBetter gameState, String playerType) {
         super(gameState, playerType);
@@ -34,31 +33,38 @@ public class MiniMaxBot extends Bot {
             return new Pair<>(node.getLastPlay(), node.getScoreDifference());
         }
 
-        ArrayList<GameStateBetter> nextStates = node.generateNextStates(isPlayerOne);
+        int[][] nextMoves = node.getEmptyBoxes();
 
         int bestValue = isPlayerOne ? Integer.MIN_VALUE : Integer.MAX_VALUE;
         Pair<Integer, Integer> bestMove = new Pair<>(-1, -1);
-        for (GameStateBetter nextState : nextStates) {
-            Pair<Pair<Integer, Integer>, Integer> minimaxReturn = minimaxPlay(nextState, remainingDepth - 1, !isPlayerOne, alpha, beta);
-            int value = minimaxReturn.getValue();
+        try {
+            for (int i = 0; i < node.getEmptyBox(); i++) {
+                GameStateBetter newState = (GameStateBetter) node.clone();
+                newState.play(nextMoves[i][0], nextMoves[i][1], isPlayerOne, false);
 
-            if (isPlayerOne) {
-                if (value > bestValue) {
-                    bestMove = nextState.getLastPlay();
-                }
-                bestValue = Math.max(value, bestValue);
-                alpha = Math.max(alpha, bestValue);
-            } else {
-                if (value < bestValue) {
-                    bestMove = nextState.getLastPlay();
-                }
-                bestValue = Math.min(value, bestValue);
-                beta = Math.min(beta, bestValue);
-            }
+                Pair<Pair<Integer, Integer>, Integer> minimaxReturn = minimaxPlay(newState, remainingDepth - 1, !isPlayerOne, alpha, beta);
+                int value = minimaxReturn.getValue();
 
-            if (beta <= alpha) {
-                break;
+                if (isPlayerOne) {
+                    if (value > bestValue) {
+                        bestMove = newState.getLastPlay();
+                    }
+                    bestValue = Math.max(value, bestValue);
+                    alpha = Math.max(alpha, bestValue);
+                } else {
+                    if (value < bestValue) {
+                        bestMove = newState.getLastPlay();
+                    }
+                    bestValue = Math.min(value, bestValue);
+                    beta = Math.min(beta, bestValue);
+                }
+
+                if (beta <= alpha) {
+                    break;
+                }
             }
+        } catch (CloneNotSupportedException | GameStateException.IllegalMove | GameStateException.RowColumnOverFlow ignored) {
+
         }
 
         return new Pair<>(bestMove, bestValue);

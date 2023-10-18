@@ -159,6 +159,20 @@ public class GameStateBetter implements Cloneable {
         return cloneState;
     }
 
+    public int[][] getEmptyBoxes() {
+        int[][] emptyBoxes = new int[this.emptyBox][2];
+        int k = 0;
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (this.gameBoardMatrix[i][j] == 0) {
+                    emptyBoxes[k] = new int[]{i, j};
+                    k++;
+                }
+            }
+        }
+        return emptyBoxes;
+    }
+
     public void play(int row, int column, boolean isPlayerOne, boolean updateButtons) throws GameStateException.RowColumnOverFlow, GameStateException.IllegalMove {
         validateMove(row, column);
 
