@@ -84,9 +84,7 @@ public class HillClimbingBot extends Bot {
             if (neighborValue == opponentValue) {
                 playerScore++;
                 opponentScore--;
-            } /* else if (neighborValue == 0) {
-                 playerScore++;
-            } */
+            }
         }
 
         return playerScore - opponentScore;
