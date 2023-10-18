@@ -326,11 +326,11 @@ public class OutputFrameController {
 
         try {
             long startTime = System.nanoTime();
-            future.get(60, TimeUnit.SECONDS);
+            future.get(5, TimeUnit.SECONDS);
             long endTime = System.nanoTime();
             System.out.print((endTime - startTime) / 1000000);
             System.out.println("ms");
-        }  catch (ExecutionException | InterruptedException | TimeoutException e) {
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
             System.out.println("Wait timeout");
             System.out.println(e.getMessage());
             future.cancel(true);
