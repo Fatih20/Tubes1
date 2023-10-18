@@ -37,7 +37,7 @@ public class Chromosome {
         try {
             GameStateBetter gameStateCopy = (GameStateBetter) this.gameState.clone();
             for (Pair<Integer, Integer> move : this.genes) {
-                gameStateCopy.play(move.getKey(), move.getValue(), isX, true);
+                gameStateCopy.play(move.getKey(), move.getValue(), isX, false);
             }
             int XScore = gameStateCopy.getxScore();
             int OScore = gameStateCopy.getoScore();
@@ -96,7 +96,7 @@ public class Chromosome {
                 return false;
             }
         }
-        
+
         return true;
     }
 }
