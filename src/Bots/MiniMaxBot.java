@@ -10,8 +10,8 @@ public class MiniMaxBot extends Bot {
 
     private int pruned = 0;
 
-    public MiniMaxBot(String playerType) {
-        super(playerType);
+    public MiniMaxBot(GameStateBetter gameState, String playerType) {
+        super(gameState, playerType);
     }
 
 
@@ -28,12 +28,11 @@ public class MiniMaxBot extends Bot {
     }
 
     /**
-     *
-     * @param node the state to start from
+     * @param node           the state to start from
      * @param remainingDepth how many more recursion has to be checked
-     * @param isPlayerOne is this player x
-     * @param alpha alpha value of minimax algorithm
-     * @param beta beta value of minimax algorithm
+     * @param isPlayerOne    is this player x
+     * @param alpha          alpha value of minimax algorithm
+     * @param beta           beta value of minimax algorithm
      * @return Last executed move and the value that results from that move
      */
     private Pair<Pair<Integer, Integer>, Integer> minimaxPlay(GameStateBetter node, int remainingDepth, boolean isPlayerOne, int alpha, int beta) {

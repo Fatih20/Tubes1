@@ -76,12 +76,10 @@ public class OutputFrameController {
 
         this.botPlayerO = BotFactory.getBot(name2, "O", gameState);
         assert botPlayerO != null;
-        botPlayerO.setGameState(gameState);
 
         if (bothBot) {
             this.botPlayerX = BotFactory.getBot(name1, "X", gameState);
             assert this.botPlayerX != null;
-            this.botPlayerX.setGameState(gameState);
         }
 
         this.playerXName.setText(name1);
@@ -99,7 +97,7 @@ public class OutputFrameController {
             this.playerXBoxPane.setStyle("-fx-background-color: WHITE; -fx-border-color: #D3D3D3;");
             this.playerOBoxPane.setStyle("-fx-background-color: #90EE90; -fx-border-color: #D3D3D3;");
         }
-            startGame();
+        startGame();
     }
 
     /**

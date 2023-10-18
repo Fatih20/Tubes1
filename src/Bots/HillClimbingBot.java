@@ -8,8 +8,9 @@ import java.util.List;
 
 public class HillClimbingBot extends Bot {
 
-    public HillClimbingBot(String playerType) {
-        super(playerType);
+
+    public HillClimbingBot(GameStateBetter gameState, String playerType) {
+        super(gameState, playerType);
     }
 
     public int[] move() {
