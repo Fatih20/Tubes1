@@ -30,27 +30,18 @@ public class GeneticAlgorithmBot extends Bot {
          * 2. Generate a random chromosome of the determined length by using heuristics
          * 3. Repeat 2. until populationSize chromosomes are generated
          * */
-        System.out.println("Poopulation Initialization started");
         for (int i = 0; i < populationSize; i++) {
-            System.out.println("i = " + i);
             Chromosome chromosome = Chromosome.make(turns - 1, this.isPlayerOne(), this.getGameState(), bannedMoves);
-            System.out.println("Chromosome generated");
-            System.out.println(chromosome);
             // check if the chromosome is unique (by its genes)
             while (population.stream().anyMatch(chromosome::equals)) {
                 chromosome = Chromosome.make(turns - 1, this.isPlayerOne(), this.getGameState(), bannedMoves);
             }
             population.add(chromosome);
-            System.out.println("Chromosome added to population");
-            System.out.println(population);
         }
     }
 
     private List<Chromosome> selectParents() {
         List<Chromosome> parents = new ArrayList<>();
-
-        System.out.println("select parents");
-        System.out.println(this.population);
 
         // make the roulette wheel
         Map<Double, Integer> rouletteWheel = new HashMap<>();
@@ -78,11 +69,8 @@ public class GeneticAlgorithmBot extends Bot {
                 numerator++;
             }
             curr += numerator / totalFitness;
-            System.out.println("i = " + i + " curr = " + curr + " fitness = " + population.get(i).getFitness());
             rouletteWheel.put(curr, i);
         }
-
-        System.out.println(rouletteWheel);
 
         // spin the wheel
         Random random = new Random();
@@ -114,8 +102,8 @@ public class GeneticAlgorithmBot extends Bot {
          *
          * NB: to pertain uniqueness of the genes for the children, the random crossover point will be tried 3 times before giving up and then the parents are just copied
          * */
+
         for (int i = 0; i < populationSize; i += 2) {
-            System.out.println("i = " + i);
             Chromosome parent1 = parents.get(i);
             Chromosome parent2 = parents.get((i + 1) % populationSize);
             int tries = 0;
@@ -124,7 +112,6 @@ public class GeneticAlgorithmBot extends Bot {
             Chromosome child1 = null;
             Chromosome child2 = null;
             while (tries < 3 && !success) {
-                System.out.println("tries = " + tries);
                 int crossoverPoint = random.nextInt(parent1.getGenes().size() / 2);
                 crossoverPoint *= 2;
                 List<Pair<Integer, Integer>> genes1 = new ArrayList<>(parent1.getGenes().subList(0, crossoverPoint));
@@ -159,21 +146,12 @@ public class GeneticAlgorithmBot extends Bot {
             this.bannedMoves.add(lastMoved);
         }
 
-        System.out.println("Initializing population");
         initializePopulation(getGameState().getRemainingTurn());
-        System.out.println("Initial population");
-        System.out.println(population);
-        System.out.println("Starting move");
 
-        int maxGenerations = 100;
+        int maxGenerations = 300;
         for (int i = 0; i < maxGenerations; i++) {
-            System.out.println("---------------------");
-            System.out.println("Generation " + i);
-            System.out.println(population);
             List<Chromosome> parents = selectParents();
-            System.out.println(parents);
             List<Chromosome> children = crossover(parents);
-            System.out.println(children);
             this.population = new ArrayList<>();
             this.population.addAll(children);
             population.forEach(Chromosome::setFitness);
@@ -183,7 +161,6 @@ public class GeneticAlgorithmBot extends Bot {
             return Integer.compare(o2.getFitness(), o1.getFitness());
         });
         Pair<Integer, Integer> res = this.population.get(0).getGenes().get(0);
-        System.out.println("Best move: " + res);
 
         bannedMoves.add(res);
 

@@ -104,12 +104,9 @@ public class Chromosome {
         try {
             GameStateBetter gameStateCopy = (GameStateBetter) this.gameState.clone();
             boolean turn = this.isX;
-            System.out.println("Genes: " + this.genes);
             for (Pair<Integer, Integer> move : this.genes) {
-                System.out.println("Move: " + move);
                 gameStateCopy.play(move.getKey(), move.getValue(), turn, false);
                 turn = !turn;
-                System.out.println("Move played");
             }
 
             int XScore = gameStateCopy.getxScore();
@@ -177,9 +174,7 @@ public class Chromosome {
             }
             chromosome.getGenes().add(move);
         }
-        System.out.println("Chromosome made, checking fitness");
         chromosome.setFitness();
-        System.out.println("Fitness checked: " + chromosome.getFitness());
         return chromosome;
     }
 }
