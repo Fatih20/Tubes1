@@ -6,7 +6,7 @@ import javafx.util.Pair;
 import java.util.*;
 
 public class GeneticAlgorithmBot extends Bot {
-    private final int populationSize = 10;
+    private final int populationSize = 50;
     private List<Chromosome> population;
     private final List<Pair<Integer, Integer>> bannedMoves;
 
@@ -33,12 +33,12 @@ public class GeneticAlgorithmBot extends Bot {
         System.out.println("Poopulation Initialization started");
         for (int i = 0; i < populationSize; i++) {
             System.out.println("i = " + i);
-            Chromosome chromosome = Chromosome.make(turns, this.isPlayerOne(), this.getGameState(), bannedMoves);
+            Chromosome chromosome = Chromosome.make(turns - 1, this.isPlayerOne(), this.getGameState(), bannedMoves);
             System.out.println("Chromosome generated");
             System.out.println(chromosome);
             // check if the chromosome is unique (by its genes)
             while (population.stream().anyMatch(chromosome::equals)) {
-                chromosome = Chromosome.make(turns, this.isPlayerOne(), this.getGameState(), bannedMoves);
+                chromosome = Chromosome.make(turns - 1, this.isPlayerOne(), this.getGameState(), bannedMoves);
             }
             population.add(chromosome);
             System.out.println("Chromosome added to population");
@@ -78,6 +78,7 @@ public class GeneticAlgorithmBot extends Bot {
                 numerator++;
             }
             curr += numerator / totalFitness;
+            System.out.println("i = " + i + " curr = " + curr + " fitness = " + population.get(i).getFitness());
             rouletteWheel.put(curr, i);
         }
 
@@ -164,7 +165,7 @@ public class GeneticAlgorithmBot extends Bot {
         System.out.println(population);
         System.out.println("Starting move");
 
-        int maxGenerations = 5;
+        int maxGenerations = 100;
         for (int i = 0; i < maxGenerations; i++) {
             System.out.println("---------------------");
             System.out.println("Generation " + i);
