@@ -1,14 +1,13 @@
 package Bots;
 
 import GameStateBetter.GameStateBetter;
-import javafx.util.Pair;
 
 import java.util.*;
 
 public class GeneticAlgorithmBot extends Bot {
     private final int populationSize = 50;
     private List<Chromosome> population;
-    private final List<Pair<Integer, Integer>> bannedMoves;
+    private final List<int[]> bannedMoves;
 
     public GeneticAlgorithmBot(GameStateBetter gameState, String playerType) {
         super(gameState, playerType);
@@ -16,7 +15,7 @@ public class GeneticAlgorithmBot extends Bot {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 if (gameState.getGameBoardMatrix()[i][j] != 0) {
-                    this.bannedMoves.add(new Pair<>(i, j));
+                    this.bannedMoves.add(new int[]{i, j});
                 }
             }
         }
@@ -127,8 +126,8 @@ public class GeneticAlgorithmBot extends Bot {
                 System.out.println("tries = " + tries);
                 int crossoverPoint = random.nextInt(parent1.getGenes().size() / 2);
                 crossoverPoint *= 2;
-                List<Pair<Integer, Integer>> genes1 = new ArrayList<>(parent1.getGenes().subList(0, crossoverPoint));
-                List<Pair<Integer, Integer>> genes2 = new ArrayList<>(parent2.getGenes().subList(0, crossoverPoint));
+                List<int[]> genes1 = new ArrayList<>(parent1.getGenes().subList(0, crossoverPoint));
+                List<int[]> genes2 = new ArrayList<>(parent2.getGenes().subList(0, crossoverPoint));
                 genes1.addAll(parent2.getGenes().subList(crossoverPoint, parent2.getGenes().size()));
                 genes2.addAll(parent1.getGenes().subList(crossoverPoint, parent1.getGenes().size()));
                 if (genes1.stream().distinct().count() == genes1.size() && genes2.stream().distinct().count() == genes2.size()) {
@@ -154,7 +153,7 @@ public class GeneticAlgorithmBot extends Bot {
     }
 
     protected int[] move() {
-        Pair<Integer, Integer> lastMoved = this.getGameState().getLastPlay();
+        int[] lastMoved = this.getGameState().getLastPlay();
         if (lastMoved != null) {
             this.bannedMoves.add(lastMoved);
         }
@@ -182,11 +181,11 @@ public class GeneticAlgorithmBot extends Bot {
         this.population.sort((o1, o2) -> {
             return Integer.compare(o2.getFitness(), o1.getFitness());
         });
-        Pair<Integer, Integer> res = this.population.get(0).getGenes().get(0);
-        System.out.println("Best move: " + res);
+        int[] res = this.population.get(0).getGenes().get(0);
+        System.out.println("Best move: " + Arrays.toString(res));
 
         bannedMoves.add(res);
 
-        return new int[]{res.getKey(), res.getValue()};
+        return new int[]{res[0], res[1]};
     }
 }

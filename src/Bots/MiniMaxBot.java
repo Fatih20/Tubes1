@@ -15,9 +15,7 @@ public class MiniMaxBot extends Bot {
     protected int[] move() {
         int remainingDepth = Math.min(this.getGameState().getRemainingTurn(), this.MAX_DEPTH);
 
-        Pair<Integer, Integer> nextMove = minimaxPlay(this.getGameState(), remainingDepth, this.isPlayerOne(), Integer.MIN_VALUE, Integer.MAX_VALUE).getKey();
-
-        return new int[]{nextMove.getKey(), nextMove.getValue()};
+        return minimaxPlay(this.getGameState(), remainingDepth, this.isPlayerOne(), Integer.MIN_VALUE, Integer.MAX_VALUE).getKey();
     }
 
     /**
@@ -28,7 +26,7 @@ public class MiniMaxBot extends Bot {
      * @param beta           beta value of minimax algorithm
      * @return Last executed move and the value that results from that move
      */
-    private Pair<Pair<Integer, Integer>, Integer> minimaxPlay(GameStateBetter node, int remainingDepth, boolean isPlayerOne, int alpha, int beta) {
+    private Pair<int[], Integer> minimaxPlay(GameStateBetter node, int remainingDepth, boolean isPlayerOne, int alpha, int beta) {
         if (remainingDepth == 0) {
             return new Pair<>(node.getLastPlay(), node.getScoreDifference());
         }
@@ -36,13 +34,13 @@ public class MiniMaxBot extends Bot {
         int[][] nextMoves = node.getEmptyBoxes();
 
         int bestValue = isPlayerOne ? Integer.MIN_VALUE : Integer.MAX_VALUE;
-        Pair<Integer, Integer> bestMove = new Pair<>(-1, -1);
+        int[] bestMove = new int[]{-1, -1};
         try {
-            for (int i = 0; i < node.getEmptyBox(); i++) {
+            for (int[] nextMove : nextMoves) {
                 GameStateBetter newState = (GameStateBetter) node.clone();
-                newState.play(nextMoves[i][0], nextMoves[i][1], isPlayerOne, false);
+                newState.play(nextMove[0], nextMove[1], isPlayerOne, false);
 
-                Pair<Pair<Integer, Integer>, Integer> minimaxReturn = minimaxPlay(newState, remainingDepth - 1, !isPlayerOne, alpha, beta);
+                Pair<int[], Integer> minimaxReturn = minimaxPlay(newState, remainingDepth - 1, !isPlayerOne, alpha, beta);
                 int value = minimaxReturn.getValue();
 
                 if (isPlayerOne) {

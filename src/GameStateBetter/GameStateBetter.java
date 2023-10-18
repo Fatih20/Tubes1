@@ -23,7 +23,7 @@ public class GameStateBetter implements Cloneable {
     private int totalTurn = 56;
     private int currentTurn = 0;
 
-    private Pair<Integer, Integer> lastPlay;
+    private int[] lastPlay;
 
     public GameStateBetter(Button[][] buttonMatrix) {
         this.buttons = buttonMatrix;
@@ -68,7 +68,7 @@ public class GameStateBetter implements Cloneable {
         return (playerOneFirst && (currentTurn % 2 == 0)) || (!playerOneFirst && !(currentTurn % 2 == 0));
     }
 
-    public Pair<Integer, Integer> getLastPlay() {
+    public int[] getLastPlay() {
         return lastPlay;
     }
 
@@ -221,7 +221,7 @@ public class GameStateBetter implements Cloneable {
 
         }
 
-        this.lastPlay = new Pair<>(row, column);
+        this.lastPlay = new int[]{row, column};
     }
 
     public void play(int row, int column, boolean isPlayerOne) throws GameStateException.RowColumnOverFlow, GameStateException.IllegalMove {
