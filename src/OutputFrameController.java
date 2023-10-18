@@ -17,10 +17,7 @@ import javafx.scene.layout.RowConstraints;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * The OutputFrameController class.  It controls button input from the users when
@@ -328,9 +325,14 @@ public class OutputFrameController {
         Future<?> future = executor.submit(bot);
 
         try {
-            future.get(5, TimeUnit.SECONDS);
-        } catch (Exception e) {
+            long startTime = System.nanoTime();
+            future.get(60, TimeUnit.SECONDS);
+            long endTime = System.nanoTime();
+            System.out.print((endTime - startTime) / 1000000);
+            System.out.println("ms");
+        }  catch (ExecutionException | InterruptedException | TimeoutException e) {
             System.out.println("Wait timeout");
+            System.out.println(e.getMessage());
             future.cancel(true);
             bot.emergencyMove();
         }

@@ -8,8 +8,6 @@ import java.util.ArrayList;
 public class MiniMaxBot extends Bot {
     private final int MAX_DEPTH = 5;
 
-    private int pruned = 0;
-
     public MiniMaxBot(GameStateBetter gameState, String playerType) {
         super(gameState, playerType);
     }
@@ -19,10 +17,6 @@ public class MiniMaxBot extends Bot {
         int remainingDepth = Math.min(this.getGameState().getRemainingTurn(), this.MAX_DEPTH);
 
         Pair<Integer, Integer> nextMove = minimaxPlay(this.getGameState(), remainingDepth, this.isPlayerOne(), Integer.MIN_VALUE, Integer.MAX_VALUE).getKey();
-
-        System.out.print("Pruning occurrence : ");
-        System.out.println(this.pruned);
-        this.pruned = 0;
 
         return new int[]{nextMove.getKey(), nextMove.getValue()};
     }
@@ -44,8 +38,6 @@ public class MiniMaxBot extends Bot {
 
         int bestValue = isPlayerOne ? Integer.MIN_VALUE : Integer.MAX_VALUE;
         Pair<Integer, Integer> bestMove = new Pair<>(-1, -1);
-
-        int i = nextStates.size();
         for (GameStateBetter nextState : nextStates) {
             Pair<Pair<Integer, Integer>, Integer> minimaxReturn = minimaxPlay(nextState, remainingDepth - 1, !isPlayerOne, alpha, beta);
             int value = minimaxReturn.getValue();
@@ -65,10 +57,8 @@ public class MiniMaxBot extends Bot {
             }
 
             if (beta <= alpha) {
-                this.pruned += i;
                 break;
             }
-            i--;
         }
 
         return new Pair<>(bestMove, bestValue);

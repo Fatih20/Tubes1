@@ -4,6 +4,7 @@ import javafx.scene.control.Button;
 import javafx.util.Pair;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @FunctionalInterface
@@ -12,7 +13,7 @@ interface scoreIncrementor {
 }
 
 public class GameStateBetter implements Cloneable {
-    private final int emptyBox = 64;
+    private int emptyBox = 64;
     private int oScore = 0;
     private int xScore = 0;
     private boolean playerOneFirst;
@@ -32,8 +33,10 @@ public class GameStateBetter implements Cloneable {
                 String content = buttonMatrix[i][j].getText();
                 if (content.equalsIgnoreCase("X")) {
                     gameBoardMatrix[i][j] = 1;
+                    emptyBox--;
                 } else if (content.equalsIgnoreCase("O")) {
                     gameBoardMatrix[i][j] = 2;
+                    emptyBox--;
                 } else {
                     gameBoardMatrix[i][j] = 0;
                 }
@@ -106,11 +109,7 @@ public class GameStateBetter implements Cloneable {
     }
 
     private void validateMove(int row, int column) throws GameStateException.RowColumnOverFlow, GameStateException.IllegalMove {
-        if (row >= 8 || row < 0) {
-            throw new GameStateException.RowColumnOverFlow();
-        }
-
-        if (column >= 8 || column < 0) {
+        if ((row >= 8 || row < 0) && (column >= 8 || column < 0)) {
             throw new GameStateException.RowColumnOverFlow();
         }
 
@@ -121,29 +120,27 @@ public class GameStateBetter implements Cloneable {
 
     /**
      * Generate all possible states that could result from this state
-     *
      * @param isPlayerOne is the turn made as player one?
      * @return all of the nextStates
      */
     public ArrayList<GameStateBetter> generateNextStates(boolean isPlayerOne) {
-        ArrayList<GameStateBetter> nextStates = new ArrayList<>();
+        ArrayList<GameStateBetter> nextStates = new ArrayList<>(Collections.nCopies(this.emptyBox, null));
 
-        int playerValue = isPlayerOne ? 1 : 2;
-        int opponentValue = !(isPlayerOne) ? 1 : 2;
-
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                if (this.gameBoardMatrix[i][j] == 0) {
-                    try {
-                        GameStateBetter nextState = (GameStateBetter) this.clone();
-                        nextState.play(i, j, isPlayerOne, false);
-                        nextStates.add(nextState);
-                    } catch (CloneNotSupportedException | GameStateException.RowColumnOverFlow |
-                             GameStateException.IllegalMove ignored) {
+        int k = 0;
+        try {
+            for (int i = 0; i < 8; i++) {
+                for (int j = 0; j < 8; j++) {
+                    if (this.gameBoardMatrix[i][j] == 0) {
+                            GameStateBetter nextState = (GameStateBetter) this.clone();
+                            nextState.play(i, j, isPlayerOne, false);
+                            nextStates.set(k, nextState);
+                            k++;
                     }
-
                 }
             }
+        } catch (CloneNotSupportedException | GameStateException.RowColumnOverFlow |
+                             GameStateException.IllegalMove ignored)
+        {
         }
         return nextStates;
     }
@@ -169,7 +166,6 @@ public class GameStateBetter implements Cloneable {
         int opponentValue = !(isPlayerOne) ? 1 : 2;
 
         String playerText = isPlayerOne ? "X" : "O";
-        String opponentText = !isPlayerOne ? "X" : "O";
 
         scoreIncrementor incrementPlayerScore = isPlayerOne ? this::incrementxScore : this::incrementoScore;
         scoreIncrementor decrementOpponentScore = !(isPlayerOne) ? this::decrementxScore : this::decrementoScore;
@@ -177,6 +173,7 @@ public class GameStateBetter implements Cloneable {
         if (gameBoardMatrix[row][column] != 0) {
             throw new GameStateException.IllegalMove();
         }
+        this.emptyBox--;
 
         gameBoardMatrix[row][column] = playerValue;
 
@@ -193,29 +190,21 @@ public class GameStateBetter implements Cloneable {
                 {row, column + 1}
         };
 
-        ArrayList<int[]> validNeighbors = new ArrayList<>();
-
         for (int[] cellNeighbor : cellNeighbors) {
             int rowNeighbor = cellNeighbor[0];
             int columnNeighbor = cellNeighbor[1];
             if (rowNeighbor >= 0 && rowNeighbor < 8 && columnNeighbor >= 0 && columnNeighbor < 8) {
-                validNeighbors.add(new int[]{cellNeighbor[0], cellNeighbor[1]});
-            }
-        }
-
-        for (int[] validNeighbor : validNeighbors) {
-            int rowNeighbor = validNeighbor[0];
-            int columnNeighbor = validNeighbor[1];
-            int neighborCell = gameBoardMatrix[rowNeighbor][columnNeighbor];
-
-            if (neighborCell == opponentValue) {
-                gameBoardMatrix[rowNeighbor][columnNeighbor] = playerValue;
-                if (updateButtons) {
-                    buttons[rowNeighbor][columnNeighbor].setText(playerText);
+                int neighborCell = gameBoardMatrix[rowNeighbor][columnNeighbor];
+                if (neighborCell == opponentValue) {
+                    gameBoardMatrix[rowNeighbor][columnNeighbor] = playerValue;
+                    if (updateButtons) {
+                        buttons[rowNeighbor][columnNeighbor].setText(playerText);
+                    }
+                    incrementPlayerScore.execute();
+                    decrementOpponentScore.execute();
                 }
-                incrementPlayerScore.execute();
-                decrementOpponentScore.execute();
             }
+
         }
 
         this.lastPlay = new Pair<>(row, column);
@@ -226,6 +215,7 @@ public class GameStateBetter implements Cloneable {
     }
 
     /**
+     *
      * @return the difference in score between player one and player two
      */
     public int getScoreDifference() {
